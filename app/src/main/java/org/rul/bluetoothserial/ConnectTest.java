@@ -35,7 +35,7 @@ public class ConnectTest extends Activity {
             UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     // Insert your bluetooth devices MAC address
-    private static String address = "34:4D:F7:FA:34:28";
+    private static String address = "00:07:02:03:10:A3";
 
     /**
      * Called when the activity is first created.
@@ -165,7 +165,7 @@ public class ConnectTest extends Activity {
                 tvLogsBluetooth.append("\n...Bluetooth is enabled...");
             } else {
                 //Prompt user to turn on Bluetooth
-                Intent enableBtIntent = new Intent(btAdapter.ACTION_REQUEST_ENABLE);
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             }
         }
@@ -180,7 +180,7 @@ public class ConnectTest extends Activity {
     }
 
     private void sendData(String message) {
-        byte[] msgBuffer = message.getBytes();
+        byte[] msgBuffer = new byte[] { (byte)0xff, (byte)0x55 , (byte)0x06 , (byte)0x60 , (byte)0x02 , (byte)0x0a , (byte)0x09 , (byte)0x00 , (byte)0x00}; //message.getBytes();
 
         Log.d(TAG, "...Sending data: " + message + "...");
         tvLogsBluetooth.append("\n....Sending data: " + message + "...");
