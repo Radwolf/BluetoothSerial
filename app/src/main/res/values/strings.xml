@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">BluetoothSerial</string>
     <string name="action_settings">Settings</string>
+    <string name="connected">connected</string>
+    <string name="unbond">unbond</string>
+    <string name="bonded">bonded</string>
+    <string name="connecting">connecting</string>
 </resources>
