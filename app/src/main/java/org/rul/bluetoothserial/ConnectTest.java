@@ -3,6 +3,7 @@ package org.rul.bluetoothserial;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 
@@ -57,7 +58,15 @@ public class ConnectTest extends Activity {
                 tvLogsBluetooth.append(String.format("\n%s (%s)", device.getName(), device.getAddress()));
             }
             createConnection();
-            sendData("a");
+            //sendData("a");
+
+            MeMotorAPI motorD = new MeMotorAPI("MotorDerecho", MeModuleAPI.PORT_M1);
+            motorD.writeCommand(1, MeModuleAPI.WRITEMODULE, 0, 100);
+
+            byte[] commandBytes = motorD.commandToByteArray();
+
+            tvLogsBluetooth.append(String.format("\n%s", Arrays.toString(commandBytes)));
+            tvLogsBluetooth.append(String.format("\n%s", motorD.readCommand(commandBytes)));
         }
 
   /*      btnOn.setOnClickListener(new OnClickListener() {
