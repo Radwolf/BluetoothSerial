@@ -1,40 +1,100 @@
 package org.rul.bluetoothserial;
 
 /**
- * Created by rgonzalez on 12/05/2016.
+ * Created by rgonzalez on 13/05/2016.
  */
-public class MeMotorAPI extends MeModuleAPI {
+public class MeMotorAPI {
 
-    public static final int COMMAND_PARAMETER_PORT = 6;
-    public static final int COMMAND_PARAMETER_SPEED_LOW = 7;
-    public static final int COMMAND_PARAMETER_SPEED_HIGH = 8;
+    private int portMotorLeft;
+    private int portMotorRight;
+    private int stopMotor = MeMotorCommunication.SPEED_0;
+    private int speedDefault;
+    private int speedBackDefault;
 
-    public static final int SPEED_0 = 0;
-    public static final int SPEED_1 = 50;
-    public static final int SPEED_2 = 100;
-    public static final int SPEED_3 = 255;
+    private MeMotorCommunication commMotorL;
+    private MeMotorCommunication commMotorR;
 
-    private int index;
-    private int port;
-    private int speedLow;
-    private int speedHigh;
-
-    public MeMotorAPI(String name, int port) {
-        super(name, LENGTH_INSTRUCTION_DCMOTOR);
-        this.port = port;
+    public MeMotorAPI(int portMotorLeft, int portMotorRight, int speedDefault, int speedBackDefault) {
+        this.portMotorLeft = portMotorLeft;
+        this.portMotorRight = portMotorRight;
+        this.speedDefault = speedDefault;
+        this.speedBackDefault = speedBackDefault;
+        commMotorL = new MeMotorCommunication("Motor Izquierdo", portMotorLeft);
+        commMotorR = new MeMotorCommunication("Motor Derecho", portMotorRight);
     }
 
-    public void writeCommand(int index, int action, int speedLow, int speedHigh) {
-        super.writeCommand();
-        this.index = index;
-        this.speedLow = speedLow;
-        this.speedHigh = speedHigh;
-        command[COMMAND_PARAMETER_PORT] = port;
-        command[COMMAND_PARAMETER_INDEX] = index;
-        command[COMMAND_PARAMETER_ACTION] = action;
-        command[COMMAND_PARAMETER_DEVICE] = DEV_DCMOTOR;
-        command[COMMAND_PARAMETER_SPEED_LOW] = speedLow;
-        command[COMMAND_PARAMETER_SPEED_HIGH] = speedHigh;
+    public int getPortMotorLeft() {
+        return portMotorLeft;
     }
 
+    public void setPortMotorLeft(int portMotorLeft) {
+        this.portMotorLeft = portMotorLeft;
+    }
+
+    public int getPortMotorRight() {
+        return portMotorRight;
+    }
+
+    public void setPortMotorRight(int portMotorRight) {
+        this.portMotorRight = portMotorRight;
+    }
+
+    public int getStopMotor() {
+        return stopMotor;
+    }
+
+    public void setStopMotor(int stopMotor) {
+        this.stopMotor = stopMotor;
+    }
+
+    public int getSpeedDefault() {
+        return speedDefault;
+    }
+
+    public void setSpeedDefault(int speedDefault) {
+        this.speedDefault = speedDefault;
+    }
+
+    public void runForward(){
+        commMotorL.writeCommand(1, MeModuleCommunication.WRITEMODULE, speedDefault, stopMotor);
+        commMotorR.writeCommand(2, MeModuleCommunication.WRITEMODULE, speedDefault, stopMotor);
+    }
+
+    public void stop(){
+        commMotorL.writeCommand(1, MeModuleCommunication.WRITEMODULE, stopMotor, stopMotor);
+        commMotorR.writeCommand(2, MeModuleCommunication.WRITEMODULE, stopMotor, stopMotor);
+    }
+
+    public void runBackward(){
+        commMotorL.writeCommand(1, MeModuleCommunication.WRITEMODULE, speedBackDefault, stopMotor);
+        commMotorR.writeCommand(2, MeModuleCommunication.WRITEMODULE, speedBackDefault, stopMotor);
+    }
+
+    public void turnLeft(){
+        commMotorL.writeCommand(1, MeModuleCommunication.WRITEMODULE, speedBackDefault, stopMotor);
+        commMotorR.writeCommand(2, MeModuleCommunication.WRITEMODULE, speedDefault, stopMotor);
+    }
+
+    public void turnRight(){
+        commMotorL.writeCommand(1, MeModuleCommunication.WRITEMODULE, speedDefault, stopMotor);
+        commMotorR.writeCommand(2, MeModuleCommunication.WRITEMODULE, speedBackDefault, stopMotor);
+    }
+
+    public void runForwardCell(){
+        runForward();
+        //Time to speed
+        stop();
+    }
+
+    public void turnLeftCell(){
+        turnLeft();
+        //Time 45º left
+        stop();
+    }
+
+    public void turnRightCell(){
+        turnRight();
+        //Time 45º right
+        stop();
+    }
 }

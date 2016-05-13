@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * Created by rgonzalez on 12/05/2016.
  */
-public class MeModuleAPI {
+public class MeModuleCommunication {
 
     public static final int COMMAND_PARAMETER_PREFIX1 = 0;
     public static final int COMMAND_PARAMETER_PREFIX2 = 1;
@@ -79,7 +79,7 @@ public class MeModuleAPI {
 
     public int[] command;
 
-    public MeModuleAPI(String name, int length){
+    public MeModuleCommunication(String name, int length){
         this.name = name;
         this.length = length;
         this.command = new int[length + 3];

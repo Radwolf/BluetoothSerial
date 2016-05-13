@@ -16,8 +16,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +24,10 @@ public class ConnectTest extends Activity {
     private static final String TAG = "ConnectTest";
 
     TextView tvLogsBluetooth;
+    ImageButton buttonForward;
+    ImageButton buttonLeft;
+    ImageButton buttonRight;
+    ImageButton buttonBackward;
 
     private static final int REQUEST_ENABLE_BT = 1;
     private BluetoothAdapter btAdapter = null;
@@ -50,6 +53,11 @@ public class ConnectTest extends Activity {
         setContentView(R.layout.activity_main);
 
         tvLogsBluetooth = (TextView) findViewById(R.id.out);
+        buttonForward = (ImageButton) findViewById(R.id.buttonForward);
+        buttonLeft = (ImageButton) findViewById(R.id.buttonLeft);
+        buttonRight = (ImageButton) findViewById(R.id.buttonRight);
+        buttonBackward = (ImageButton) findViewById(R.id.buttonBackward);
+
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         Set<BluetoothDevice> devices = btAdapter.getBondedDevices();
         checkBTState();
@@ -60,8 +68,8 @@ public class ConnectTest extends Activity {
             createConnection();
             //sendData("a");
 
-            MeMotorAPI motorD = new MeMotorAPI("MotorDerecho", MeModuleAPI.PORT_M1);
-            motorD.writeCommand(1, MeModuleAPI.WRITEMODULE, 0, 100);
+            MeMotorCommunication motorD = new MeMotorCommunication("MotorDerecho", MeModuleCommunication.PORT_M1);
+            motorD.writeCommand(1, MeModuleCommunication.WRITEMODULE, 0, 100);
 
             byte[] commandBytes = motorD.commandToByteArray();
 
@@ -69,23 +77,21 @@ public class ConnectTest extends Activity {
             tvLogsBluetooth.append(String.format("\n%s", motorD.readCommand(commandBytes)));
         }
 
-  /*      btnOn.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                sendData("1");
-                Toast msg = Toast.makeText(getBaseContext(),
-                        "You have clicked On", Toast.LENGTH_SHORT);
-                msg.show();
-            }
-        });
+        buttonForward.setOnClickListener(new View.OnClickListener() {
 
-        btnOff.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                sendData("0");
-                Toast msg = Toast.makeText(getBaseContext(),
-                        "You have clicked Off", Toast.LENGTH_SHORT);
-                msg.show();
+            public void onClick(View button) {
+                //Set the button's appearance
+                button.setSelected(!button.isSelected());
+
+                if (button.isSelected()) {
+                    tvLogsBluetooth.append("\nPulso el botón avanzar");
+                } else {
+                    tvLogsBluetooth.append("\nSuelto el botón avanzar");
+                }
+
             }
-        });*/
+
+        });
     }
 
     private void createConnection(){
