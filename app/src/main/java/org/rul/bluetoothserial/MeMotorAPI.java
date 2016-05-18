@@ -8,11 +8,15 @@ public class MeMotorAPI {
     private int portMotorLeft;
     private int portMotorRight;
     private int stopMotor = MeMotorCommunication.SPEED_0;
+    private int stopInverseMotor = MeMotorCommunication.SPEED_3;
     private int speedDefault;
     private int speedBackDefault;
 
     private MeMotorCommunication commMotorL;
     private MeMotorCommunication commMotorR;
+
+    private byte[] msgLeft;
+    private byte[] msgRight;
 
     public MeMotorAPI(int portMotorLeft, int portMotorRight, int speedDefault, int speedBackDefault) {
         this.portMotorLeft = portMotorLeft;
@@ -55,29 +59,55 @@ public class MeMotorAPI {
         this.speedDefault = speedDefault;
     }
 
+    public byte[] getMsgLeft() {
+        return msgLeft;
+    }
+
+    public void setMsgLeft(byte[] msgLeft) {
+        this.msgLeft = msgLeft;
+    }
+
+    public byte[] getMsgRight() {
+        return msgRight;
+    }
+
+    public void setMsgRight(byte[] msgRight) {
+        this.msgRight = msgRight;
+    }
+
     public void runForward(){
-        commMotorL.writeCommand(1, MeModuleCommunication.WRITEMODULE, speedDefault, stopMotor);
-        commMotorR.writeCommand(2, MeModuleCommunication.WRITEMODULE, speedDefault, stopMotor);
+        commMotorL.writeCommand(1, MeModuleCommunication.WRITEMODULE, speedDefault, stopInverseMotor);
+        msgLeft = commMotorL.commandToByteArray();
+        commMotorR.writeCommand(2, MeModuleCommunication.WRITEMODULE, speedBackDefault, stopMotor);
+        msgRight = commMotorR.commandToByteArray();
     }
 
     public void stop(){
         commMotorL.writeCommand(1, MeModuleCommunication.WRITEMODULE, stopMotor, stopMotor);
+        msgLeft = commMotorL.commandToByteArray();
         commMotorR.writeCommand(2, MeModuleCommunication.WRITEMODULE, stopMotor, stopMotor);
+        msgRight = commMotorR.commandToByteArray();
     }
 
     public void runBackward(){
         commMotorL.writeCommand(1, MeModuleCommunication.WRITEMODULE, speedBackDefault, stopMotor);
-        commMotorR.writeCommand(2, MeModuleCommunication.WRITEMODULE, speedBackDefault, stopMotor);
+        msgLeft = commMotorL.commandToByteArray();
+        commMotorR.writeCommand(2, MeModuleCommunication.WRITEMODULE, speedDefault, stopInverseMotor);
+        msgRight = commMotorR.commandToByteArray();
     }
 
     public void turnLeft(){
         commMotorL.writeCommand(1, MeModuleCommunication.WRITEMODULE, speedBackDefault, stopMotor);
-        commMotorR.writeCommand(2, MeModuleCommunication.WRITEMODULE, speedDefault, stopMotor);
+        msgLeft = commMotorL.commandToByteArray();
+        commMotorR.writeCommand(2, MeModuleCommunication.WRITEMODULE, speedBackDefault, stopMotor);
+        msgRight = commMotorR.commandToByteArray();
     }
 
     public void turnRight(){
-        commMotorL.writeCommand(1, MeModuleCommunication.WRITEMODULE, speedDefault, stopMotor);
-        commMotorR.writeCommand(2, MeModuleCommunication.WRITEMODULE, speedBackDefault, stopMotor);
+        commMotorL.writeCommand(1, MeModuleCommunication.WRITEMODULE, speedDefault, stopInverseMotor);
+        msgLeft = commMotorL.commandToByteArray();
+        commMotorR.writeCommand(2, MeModuleCommunication.WRITEMODULE, speedDefault, stopInverseMotor);
+        msgRight = commMotorR.commandToByteArray();
     }
 
     public void runForwardCell(){

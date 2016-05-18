@@ -13,8 +13,10 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -68,29 +70,194 @@ public class ConnectTest extends Activity {
             createConnection();
             //sendData("a");
 
-            MeMotorCommunication motorD = new MeMotorCommunication("MotorDerecho", MeModuleCommunication.PORT_M1);
-            motorD.writeCommand(1, MeModuleCommunication.WRITEMODULE, 0, 100);
-
-            byte[] commandBytes = motorD.commandToByteArray();
-
-            tvLogsBluetooth.append(String.format("\n%s", Arrays.toString(commandBytes)));
-            tvLogsBluetooth.append(String.format("\n%s", motorD.readCommand(commandBytes)));
+//            MeMotorCommunication motorD = new MeMotorCommunication("MotorDerecho", MeModuleCommunication.PORT_M1);
+//            motorD.writeCommand(1, MeModuleCommunication.WRITEMODULE, 0, 100);
+//
+//            byte[] commandBytes = motorD.commandToByteArray();
+//
+//            tvLogsBluetooth.append(String.format("\n%s", Arrays.toString(commandBytes)));
+//            tvLogsBluetooth.append(String.format("\n%s", motorD.readCommand(commandBytes)));
         }
 
-        buttonForward.setOnClickListener(new View.OnClickListener() {
+//        buttonForward.setOnClickListener(new View.OnClickListener() {
+//
+//            public void onClick(View button) {
+//                //Set the button's appearance
+//                button.setSelected(!button.isSelected());
+//
+//                if (button.isSelected()) {
+//                    tvLogsBluetooth.append("\nPulso el botón avanzar");
+//                } else {
+//                    tvLogsBluetooth.append("\nSuelto el botón avanzar");
+//                }
+//
+//            }
+//
+//        });
 
-            public void onClick(View button) {
-                //Set the button's appearance
-                button.setSelected(!button.isSelected());
+        final MeMotorAPI motorAPI = new MeMotorAPI(MeModuleCommunication.PORT_M1, MeModuleCommunication.PORT_M2, 100, -100);
+        buttonForward.setOnTouchListener(new View.OnTouchListener() {
 
-                if (button.isSelected()) {
-                    tvLogsBluetooth.append("\nPulso el botón avanzar");
-                } else {
-                    tvLogsBluetooth.append("\nSuelto el botón avanzar");
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        ImageButton view = (ImageButton ) v;
+                        view.getBackground().setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
+                        v.invalidate();
+                        motorAPI.runForward();
+                        sendData(motorAPI.getMsgLeft());
+                        tvLogsBluetooth.append(String.format("\n%s", Utils.bytesToHexString(motorAPI.getMsgLeft())));
+                        sendData(motorAPI.getMsgRight());
+                        tvLogsBluetooth.append(String.format("\n%s", Utils.bytesToHexString(motorAPI.getMsgRight())));
+                        tvLogsBluetooth.append("\nPulso el botón avanzar");
+                        break;
+                    }
+                    case MotionEvent.ACTION_UP: {
+                        ImageButton view = (ImageButton) v;
+                        view.getBackground().clearColorFilter();
+                        view.invalidate();
+                        motorAPI.stop();
+                        sendData(motorAPI.getMsgLeft());
+                        tvLogsBluetooth.append(String.format("\n%s", Utils.bytesToHexString(motorAPI.getMsgLeft())));
+                        sendData(motorAPI.getMsgRight());
+                        tvLogsBluetooth.append(String.format("\n%s", Utils.bytesToHexString(motorAPI.getMsgRight())));
+                        tvLogsBluetooth.append("\nSuelto el botón avanzar");
+                        // Your action here on button click
+                        break;
+                    }
+                    case MotionEvent.ACTION_CANCEL: {
+                        ImageButton view = (ImageButton) v;
+                        view.getBackground().clearColorFilter();
+                        view.invalidate();
+                        break;
+                    }
                 }
-
+                return true;
             }
+        });
 
+        buttonBackward.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        ImageButton view = (ImageButton ) v;
+                        view.getBackground().setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
+                        v.invalidate();
+                        motorAPI.runBackward();
+                        sendData(motorAPI.getMsgLeft());
+                        tvLogsBluetooth.append(String.format("\n%s", Utils.bytesToHexString(motorAPI.getMsgLeft())));
+                        sendData(motorAPI.getMsgRight());
+                        tvLogsBluetooth.append(String.format("\n%s", Utils.bytesToHexString(motorAPI.getMsgRight())));
+                        tvLogsBluetooth.append("\nPulso el botón avanzar");
+                        break;
+                    }
+                    case MotionEvent.ACTION_UP: {
+                        ImageButton view = (ImageButton) v;
+                        view.getBackground().clearColorFilter();
+                        view.invalidate();
+                        motorAPI.stop();
+                        sendData(motorAPI.getMsgLeft());
+                        tvLogsBluetooth.append(String.format("\n%s", Utils.bytesToHexString(motorAPI.getMsgLeft())));
+                        sendData(motorAPI.getMsgRight());
+                        tvLogsBluetooth.append(String.format("\n%s", Utils.bytesToHexString(motorAPI.getMsgRight())));
+                        tvLogsBluetooth.append("\nSuelto el botón avanzar");
+                        // Your action here on button click
+                        break;
+                    }
+                    case MotionEvent.ACTION_CANCEL: {
+                        ImageButton view = (ImageButton) v;
+                        view.getBackground().clearColorFilter();
+                        view.invalidate();
+                        break;
+                    }
+                }
+                return true;
+            }
+        });
+
+        buttonLeft.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        ImageButton view = (ImageButton ) v;
+                        view.getBackground().setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
+                        v.invalidate();
+                        motorAPI.turnLeft();
+                        sendData(motorAPI.getMsgLeft());
+                        tvLogsBluetooth.append(String.format("\n%s", Utils.bytesToHexString(motorAPI.getMsgLeft())));
+                        sendData(motorAPI.getMsgRight());
+                        tvLogsBluetooth.append(String.format("\n%s", Utils.bytesToHexString(motorAPI.getMsgRight())));
+                        tvLogsBluetooth.append("\nPulso el botón avanzar");
+                        break;
+                    }
+                    case MotionEvent.ACTION_UP: {
+                        ImageButton view = (ImageButton) v;
+                        view.getBackground().clearColorFilter();
+                        view.invalidate();
+                        motorAPI.stop();
+                        sendData(motorAPI.getMsgLeft());
+                        tvLogsBluetooth.append(String.format("\n%s", Utils.bytesToHexString(motorAPI.getMsgLeft())));
+                        sendData(motorAPI.getMsgRight());
+                        tvLogsBluetooth.append(String.format("\n%s", Utils.bytesToHexString(motorAPI.getMsgRight())));
+                        tvLogsBluetooth.append("\nSuelto el botón avanzar");
+                        // Your action here on button click
+                        break;
+                    }
+                    case MotionEvent.ACTION_CANCEL: {
+                        ImageButton view = (ImageButton) v;
+                        view.getBackground().clearColorFilter();
+                        view.invalidate();
+                        break;
+                    }
+                }
+                return true;
+            }
+        });
+
+        buttonRight.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        ImageButton view = (ImageButton ) v;
+                        view.getBackground().setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
+                        v.invalidate();
+                        motorAPI.turnRight();
+                        sendData(motorAPI.getMsgLeft());
+                        tvLogsBluetooth.append(String.format("\n%s", Utils.bytesToHexString(motorAPI.getMsgLeft())));
+                        sendData(motorAPI.getMsgRight());
+                        tvLogsBluetooth.append(String.format("\n%s", Utils.bytesToHexString(motorAPI.getMsgRight())));
+                        tvLogsBluetooth.append("\nPulso el botón avanzar");
+                        break;
+                    }
+                    case MotionEvent.ACTION_UP: {
+                        ImageButton view = (ImageButton) v;
+                        view.getBackground().clearColorFilter();
+                        view.invalidate();
+                        motorAPI.stop();
+                        sendData(motorAPI.getMsgLeft());
+                        tvLogsBluetooth.append(String.format("\n%s", Utils.bytesToHexString(motorAPI.getMsgLeft())));
+                        sendData(motorAPI.getMsgRight());
+                        tvLogsBluetooth.append(String.format("\n%s", Utils.bytesToHexString(motorAPI.getMsgRight())));
+                        tvLogsBluetooth.append("\nSuelto el botón avanzar");
+                        // Your action here on button click
+                        break;
+                    }
+                    case MotionEvent.ACTION_CANCEL: {
+                        ImageButton view = (ImageButton) v;
+                        view.getBackground().clearColorFilter();
+                        view.invalidate();
+                        break;
+                    }
+                }
+                return true;
+            }
         });
     }
 
@@ -194,13 +361,13 @@ public class ConnectTest extends Activity {
         finish();
     }
 
-    private void sendData(String message) {
-        byte[] msgBuffer = new byte[] { (byte)0xff, (byte)0x55 , (byte)0x06 , (byte)0x60 , (byte)0x02 , (byte)0x0a , (byte)0x09 , (byte)0x00 , (byte)0x00}; //message.getBytes();
+    private void sendData(byte[] message) {
+        //byte[] msgBuffer = new byte[] { (byte)0xff, (byte)0x55 , (byte)0x06 , (byte)0x60 , (byte)0x02 , (byte)0x0a , (byte)0x09 , (byte)0x00 , (byte)0x00}; //message.getBytes();
 
         Log.d(TAG, "...Sending data: " + message + "...");
         tvLogsBluetooth.append("\n....Sending data: " + message + "...");
         try {
-            outStream.write(msgBuffer);
+            outStream.write(message);
         } catch (IOException e) {
             String msg = "In onResume() and an exception occurred during write: " + e.getMessage();
             if (address.equals("00:00:00:00:00:00"))
@@ -210,4 +377,5 @@ public class ConnectTest extends Activity {
             errorExit("Fatal Error", msg);
         }
     }
+
 }
