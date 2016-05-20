@@ -94,7 +94,7 @@ public class ConnectTest extends Activity {
 //
 //        });
 
-        final MeMotorAPI motorAPI = new MeMotorAPI(MeModuleCommunication.PORT_M1, MeModuleCommunication.PORT_M2, 100, -100);
+ /*       final MeMotorAPI motorAPI = new MeMotorAPI(MeModuleCommunication.PORT_M1, MeModuleCommunication.PORT_M2, 100, -100);
         buttonForward.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
@@ -257,7 +257,7 @@ public class ConnectTest extends Activity {
                 }
                 return true;
             }
-        });
+        });*/
     }
 
     private void createConnection(){
