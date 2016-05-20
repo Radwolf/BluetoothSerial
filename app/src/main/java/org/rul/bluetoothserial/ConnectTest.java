@@ -3,7 +3,6 @@ package org.rul.bluetoothserial;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 

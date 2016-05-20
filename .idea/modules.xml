@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BluetoothSerial.iml" filepath="$PROJECT_DIR$/BluetoothSerial.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/meapi/meapi.iml" filepath="$PROJECT_DIR$/meapi/meapi.iml" />
     </modules>
   </component>
 </project>
