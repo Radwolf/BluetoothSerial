@@ -21,6 +21,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.rul.meapi.MeConstants;
+import org.rul.meapi.MeMotorDevice;
+import org.rul.meapi.model.CommandSimple;
+
 public class ConnectTest extends Activity {
     private static final String TAG = "ConnectTest";
 
@@ -34,6 +38,8 @@ public class ConnectTest extends Activity {
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
     private OutputStream outStream = null;
+
+    private CommandSimple commandSimple;
 
     // Well known SPP UUID
     private static final UUID MY_UUID =
@@ -68,7 +74,14 @@ public class ConnectTest extends Activity {
             }
             createConnection();
             //sendData("a");
-
+            MeMotorDevice meMotorDeviceI = new MeMotorDevice("Prueba giro inverso", MeConstants.PORT_M1);
+            MeMotorDevice meMotorDeviceD = new MeMotorDevice("Prueba giro directo", MeConstants.PORT_M2);
+            CommandSimple commandSimpleI = meMotorDeviceI.giroInverso((byte) 156);
+            tvLogsBluetooth.append("\n" + commandSimpleI.maskToString());
+            sendData(commandSimpleI);
+            CommandSimple commandSimpleD = meMotorDeviceD.giroDirecto((byte) 100);
+            tvLogsBluetooth.append("\n" + commandSimpleD.maskToString());
+            sendData(commandSimpleD);
 //            MeMotorCommunication motorD = new MeMotorCommunication("MotorDerecho", MeModuleCommunication.PORT_M1);
 //            motorD.writeCommand(1, MeModuleCommunication.WRITEMODULE, 0, 100);
 //
@@ -360,13 +373,13 @@ public class ConnectTest extends Activity {
         finish();
     }
 
-    private void sendData(byte[] message) {
+    private void sendData(CommandSimple commandSimple) {
         //byte[] msgBuffer = new byte[] { (byte)0xff, (byte)0x55 , (byte)0x06 , (byte)0x60 , (byte)0x02 , (byte)0x0a , (byte)0x09 , (byte)0x00 , (byte)0x00}; //message.getBytes();
 
-        Log.d(TAG, "...Sending data: " + message + "...");
-        tvLogsBluetooth.append("\n....Sending data: " + message + "...");
+        Log.d(TAG, "...Sending data: " + commandSimple.toString() + "...");
+        tvLogsBluetooth.append("\n....Sending data: " + commandSimple.toString() + "...");
         try {
-            outStream.write(message);
+            outStream.write(commandSimple.toByteArray());
         } catch (IOException e) {
             String msg = "In onResume() and an exception occurred during write: " + e.getMessage();
             if (address.equals("00:00:00:00:00:00"))

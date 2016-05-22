@@ -17,8 +17,8 @@ public class MeTransmission2MotorDevice {
 
     public CommandSequence runForward(){
         CommandSequence commandSequence = new CommandSequence();
-        commandSequence.addCommand(motorRight.giroDirecto());
-        commandSequence.addCommand(motorLeft.giroInverso());
+        commandSequence.addCommand(motorRight.giroDirecto((byte) 100));
+        commandSequence.addCommand(motorLeft.giroInverso((byte) 156));
         return commandSequence;
     }
 

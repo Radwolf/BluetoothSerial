@@ -2,6 +2,9 @@ package org.rul.meapi;
 
 import org.rul.meapi.model.CommandSimple;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 public class MeDevice {
 
     public static final int COMMAND_PARAMETER_PREFIX1 = 0;
