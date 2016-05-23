@@ -10,37 +10,26 @@ import java.nio.ByteOrder;
  */
 public class CommandSimple {
 
-    private int[] cadena;
+    private ByteBuffer byteCadena;
     private String name;
     private int index;
-    private int secondsTimer;
     private int tipo;  //Escritura o Lectura
     private ByteBuffer validateMask;
 
-    public CommandSimple(String name, int lenght) {
+    public CommandSimple(String name, int index, int lenght, int tipo) {
         this.name = name;
-        this.secondsTimer = 0;
-        this.cadena = new int[lenght+3];
-        validateMask = ByteBuffer.allocate(lenght + 3).order(ByteOrder.LITTLE_ENDIAN);
-        initCadena();
-    }
-
-    private void initCadena() {
-        for(int i = 0; i < cadena.length; i++){
-            cadena[i] = -1;
-        }
-    }
-
-    public void setIndex(int index) {
         this.index = index;
+        this.tipo = tipo;
+        byteCadena = ByteBuffer.allocate(lenght + 3).order(ByteOrder.LITTLE_ENDIAN);
+        validateMask = ByteBuffer.allocate(lenght + 3).order(ByteOrder.LITTLE_ENDIAN);
     }
 
-    public void setSecondsTimer(int secondsTimer) {
-        this.secondsTimer = secondsTimer;
+    public int getTipo() {
+        return tipo;
     }
 
-    public ByteBuffer getValidateMask() {
-        return validateMask;
+    public int getIndex() {
+        return index;
     }
 
     public String maskToString(){
@@ -50,28 +39,62 @@ public class CommandSimple {
         }
         return maskString.toString();
     }
-    public void setElementCadena(int position, int value){
+
+    /*
+     * Setea un valor en una posicion de la cadena, y rellena la mascara de validacion
+     */
+    public void setElementCadena(int position, byte value){
         validateMask.put(position, (byte) 1);
-        cadena[position] = value;
+        byteCadena.put(position, value);
     }
 
+    /*
+     * Nos retorna la array de bytes de la cadena
+     */
+    public byte[] getCadena() {
+        return byteCadena.array();
+    }
+
+    /*
+     * Nos devuelve la representacion en string de la cadena de bytes
+     */
+    public String toString(){
+        return Utils.bytesToHexString(byteCadena.array());
+    }
+
+    /*
+     * Nos valida si se han seteado valores en todas las posiciones de la cadena del comando
+     */
     public boolean isCommandComplet(){
-        boolean commandComplet = false;
-        for(int i = 0; i < cadena.length; i++){
-            commandComplet = !(cadena[i] == -1);
+        boolean commandComplet = true;
+        for(int i = 0; i < validateMask.limit() && commandComplet; i++){
+            commandComplet = (validateMask.get(i) == 1);
         }
         return commandComplet;
     }
 
-    public String toString(){
-        return Utils.bytesToHexString(this.toByteArray());
+    /*
+     * Nos indica si dos cadenas de byte son iguales
+     */
+    public boolean isCadenaValid(ByteBuffer byteBufferCheck){
+        byteBufferCheck.rewind();
+        byteCadena.rewind();
+        return byteBufferCheck.equals(byteCadena);
     }
 
-    public byte[] toByteArray(){
-        final byte[] bytes = new byte[cadena.length];
-        for(int i = 0; i < cadena.length; i++) {
-            bytes[i] = (byte) cadena[i];
+    /*
+     * Checkea si dos cadenas de bytes son identicas en cuanto contenido retorna la posición que
+     * difiere o el tamaño de la cadena si no ha encontrado diferencia
+     */
+    public int checkByteCadena(ByteBuffer byteBufferCheck){
+        int position;
+        if(byteBufferCheck.limit() == byteCadena.limit()) {
+            for (position = 0; position < byteBufferCheck.limit()
+                    && byteCadena.get(position) == byteBufferCheck.get(position); position++) {
+            }
+        }else{
+            position = -1;
         }
-        return bytes;
+        return position;
     }
 }

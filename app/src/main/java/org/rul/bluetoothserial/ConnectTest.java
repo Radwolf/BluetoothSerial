@@ -379,7 +379,7 @@ public class ConnectTest extends Activity {
         Log.d(TAG, "...Sending data: " + commandSimple.toString() + "...");
         tvLogsBluetooth.append("\n....Sending data: " + commandSimple.toString() + "...");
         try {
-            outStream.write(commandSimple.toByteArray());
+            outStream.write(commandSimple.getCadena());
         } catch (IOException e) {
             String msg = "In onResume() and an exception occurred during write: " + e.getMessage();
             if (address.equals("00:00:00:00:00:00"))

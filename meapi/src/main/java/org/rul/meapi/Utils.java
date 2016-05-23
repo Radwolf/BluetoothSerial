@@ -38,4 +38,8 @@ public class Utils {
         }
         return stringBuilder.toString();
     }
+
+    public static byte intToByte(int intValue){
+        return (byte) (intValue & 0xff);
+    }
 }

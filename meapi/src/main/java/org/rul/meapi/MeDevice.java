@@ -10,8 +10,8 @@ public class MeDevice {
     public static final int COMMAND_PARAMETER_PREFIX1 = 0;
     public static final int COMMAND_PARAMETER_PREFIX2 = 1;
 
-    public static final int INSTRUCTION_PREFIX1 = 255;
-    public static final int INSTRUCTION_PREFIX2 = 85;
+    public static final byte INSTRUCTION_PREFIX1 = (byte)0xFF;
+    public static final byte INSTRUCTION_PREFIX2 = (byte)0x55;
 
     public static final int LENGTH_INSTRUCTION_HEAD = 3;
 

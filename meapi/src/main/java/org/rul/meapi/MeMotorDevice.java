@@ -22,6 +22,7 @@ public class MeMotorDevice extends MeDevice {
     public static final int LENGTH_INSTRUCTION_DCMOTOR= 6;
 
     private int port;
+    private int speed;
 
     public MeMotorDevice(String name, int port) {
         super(name);
@@ -30,32 +31,34 @@ public class MeMotorDevice extends MeDevice {
 
     protected void initCommand(CommandSimple command){
         super.initCommand(command);
-        command.setElementCadena(COMMAND_PARAMETER_LENGTH, LENGTH_INSTRUCTION_DCMOTOR);
-        command.setElementCadena(COMMAND_PARAMETER_DEVICE, MeConstants.DEV_DCMOTOR);
-        command.setElementCadena(COMMAND_PARAMETER_ACTION, MeConstants.WRITEMODULE);
+        command.setElementCadena(COMMAND_PARAMETER_LENGTH, Utils.intToByte(LENGTH_INSTRUCTION_DCMOTOR));
+        command.setElementCadena(COMMAND_PARAMETER_DEVICE, Utils.intToByte(MeConstants.DEV_DCMOTOR));
+        command.setElementCadena(COMMAND_PARAMETER_ACTION, Utils.intToByte(command.getTipo()));
     }
 
     //Rotacion sentido de las agujas del reloj
-    public CommandSimple giroDirecto(byte speedDefaultDirect){
-        CommandSimple command = new CommandSimple("Giro directo motor", LENGTH_INSTRUCTION_DCMOTOR);
+    public CommandSimple giroDirecto(int speed){
+        CommandSimple command = new CommandSimple("Giro directo motor", 2, LENGTH_INSTRUCTION_DCMOTOR, MeConstants.WRITEMODULE);
         initCommand(command);
-        //command.setElementCadena(PARAMETROS);
-        command.setElementCadena(COMMAND_PARAMETER_INDEX, 2);
-        command.setElementCadena(COMMAND_PARAMETER_PORT, port);
-        command.setElementCadena(COMMAND_PARAMETER_SPEED_LOW, speedDefaultDirect);
-        command.setElementCadena(COMMAND_PARAMETER_SPEED_HIGH, 0);
+        command.setElementCadena(COMMAND_PARAMETER_INDEX, Utils.intToByte(command.getIndex()));
+        command.setElementCadena(COMMAND_PARAMETER_PORT, Utils.intToByte(port));
+        setSpeedToCommand(command, speed);
         return command;
     }
 
     //Rotacion sentido inverso a las agujas del reloj
-    public CommandSimple giroInverso(byte speedDefaultReverse){
-        CommandSimple command = new CommandSimple("Giro directo motor", LENGTH_INSTRUCTION_DCMOTOR);
+    public CommandSimple giroInverso(int speed){
+        CommandSimple command = new CommandSimple("Giro directo motor", 1, LENGTH_INSTRUCTION_DCMOTOR, MeConstants.WRITEMODULE);
         initCommand(command);
-        //command.setElementCadena(PARAMETROS);
-        command.setElementCadena(COMMAND_PARAMETER_INDEX, 1);
-        command.setElementCadena(COMMAND_PARAMETER_PORT, port);
-        command.setElementCadena(COMMAND_PARAMETER_SPEED_LOW, speedDefaultReverse);
-        command.setElementCadena(COMMAND_PARAMETER_SPEED_HIGH, (byte) -1);
+        command.setElementCadena(COMMAND_PARAMETER_INDEX, Utils.intToByte(command.getIndex()));
+        command.setElementCadena(COMMAND_PARAMETER_PORT, Utils.intToByte(port));
+        setSpeedToCommand(command, speed);
         return command;
+    }
+
+    private void setSpeedToCommand(CommandSimple command, int speed){
+        this.speed = speed;
+        command.setElementCadena(COMMAND_PARAMETER_SPEED_LOW, (byte) (speed & 0xff));
+        command.setElementCadena(COMMAND_PARAMETER_SPEED_HIGH, (byte) ((speed >> 8) & 0xff));
     }
 }
