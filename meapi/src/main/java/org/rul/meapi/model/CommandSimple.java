@@ -8,28 +8,15 @@ import java.nio.ByteOrder;
 /**
  * Created by rgonzalez on 20/05/2016.
  */
-public class CommandSimple {
+public class CommandSimple extends CommandAbstract{
 
     private ByteBuffer byteCadena;
-    private String name;
-    private int index;
-    private int tipo;  //Escritura o Lectura
     private ByteBuffer validateMask;
 
     public CommandSimple(String name, int index, int lenght, int tipo) {
-        this.name = name;
-        this.index = index;
-        this.tipo = tipo;
+        super(name, tipo, index);
         byteCadena = ByteBuffer.allocate(lenght + 3).order(ByteOrder.LITTLE_ENDIAN);
         validateMask = ByteBuffer.allocate(lenght + 3).order(ByteOrder.LITTLE_ENDIAN);
-    }
-
-    public int getTipo() {
-        return tipo;
-    }
-
-    public int getIndex() {
-        return index;
     }
 
     public String maskToString(){

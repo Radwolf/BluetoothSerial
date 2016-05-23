@@ -3,6 +3,7 @@ package org.rul.bluetoothserial;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Calendar;
 import java.util.Set;
 import java.util.UUID;
 
@@ -271,7 +272,16 @@ public class ConnectTest extends Activity {
                 return true;
             }
         });*/
+
     }
+
+    public void calibrateRunOneCell(int speed){
+        Calendar calendarIni = Calendar.getInstance();
+        long milisIni = calendarIni.getTimeInMillis();
+        //runForward(speed);
+
+    }
+
 
     private void createConnection(){
         Log.d(TAG, "...In onResume - Attempting client connect...");

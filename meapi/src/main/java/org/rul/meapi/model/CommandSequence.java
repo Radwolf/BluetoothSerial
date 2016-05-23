@@ -7,12 +7,14 @@ import java.util.List;
  */
 public class CommandSequence {
 
-    List<CommandSimple> commands;
+    String name;
+    List<CommandAbstract> commands;
 
-    public CommandSequence() {
+    public CommandSequence(String name) {
+        this.name = name;
     }
 
-    public void addCommand(CommandSimple command){
+    public void addCommand(CommandAbstract command){
         commands.add(command);
     }
 }

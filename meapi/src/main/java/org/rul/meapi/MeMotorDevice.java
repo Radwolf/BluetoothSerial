@@ -33,7 +33,7 @@ public class MeMotorDevice extends MeDevice {
         super.initCommand(command);
         command.setElementCadena(COMMAND_PARAMETER_LENGTH, Utils.intToByte(LENGTH_INSTRUCTION_DCMOTOR));
         command.setElementCadena(COMMAND_PARAMETER_DEVICE, Utils.intToByte(MeConstants.DEV_DCMOTOR));
-        command.setElementCadena(COMMAND_PARAMETER_ACTION, Utils.intToByte(command.getTipo()));
+        command.setElementCadena(COMMAND_PARAMETER_ACTION, Utils.intToByte(command.getType()));
     }
 
     //Rotacion sentido de las agujas del reloj
@@ -52,7 +52,17 @@ public class MeMotorDevice extends MeDevice {
         initCommand(command);
         command.setElementCadena(COMMAND_PARAMETER_INDEX, Utils.intToByte(command.getIndex()));
         command.setElementCadena(COMMAND_PARAMETER_PORT, Utils.intToByte(port));
-        setSpeedToCommand(command, speed);
+        setSpeedToCommand(command, speed * -1);
+        return command;
+    }
+
+    //Rotacion quieto
+    public CommandSimple stop(){
+        CommandSimple command = new CommandSimple("Giro directo motor", 1, LENGTH_INSTRUCTION_DCMOTOR, MeConstants.WRITEMODULE);
+        initCommand(command);
+        command.setElementCadena(COMMAND_PARAMETER_INDEX, Utils.intToByte(command.getIndex()));
+        command.setElementCadena(COMMAND_PARAMETER_PORT, Utils.intToByte(port));
+        setSpeedToCommand(command, 0);
         return command;
     }
 
