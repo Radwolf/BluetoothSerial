@@ -23,10 +23,12 @@ public class MeMotorDevice extends MeDevice {
 
     private int port;
     private int speed;
+    private int index;
 
-    public MeMotorDevice(String name, int port) {
+    public MeMotorDevice(String name, int port, int index) {
         super(name);
         this.port = port;
+        this.index = index;
     }
 
     protected void initCommand(CommandSimple command){
@@ -38,7 +40,7 @@ public class MeMotorDevice extends MeDevice {
 
     //Rotacion sentido de las agujas del reloj
     public CommandSimple giroDirecto(int speed){
-        CommandSimple command = new CommandSimple("Giro directo motor", 2, LENGTH_INSTRUCTION_DCMOTOR, MeConstants.WRITEMODULE);
+        CommandSimple command = new CommandSimple("Giro directo motor", index, LENGTH_INSTRUCTION_DCMOTOR, MeConstants.WRITEMODULE);
         initCommand(command);
         command.setElementCadena(COMMAND_PARAMETER_INDEX, Utils.intToByte(command.getIndex()));
         command.setElementCadena(COMMAND_PARAMETER_PORT, Utils.intToByte(port));
@@ -48,7 +50,7 @@ public class MeMotorDevice extends MeDevice {
 
     //Rotacion sentido inverso a las agujas del reloj
     public CommandSimple giroInverso(int speed){
-        CommandSimple command = new CommandSimple("Giro directo motor", 1, LENGTH_INSTRUCTION_DCMOTOR, MeConstants.WRITEMODULE);
+        CommandSimple command = new CommandSimple("Giro directo motor", index, LENGTH_INSTRUCTION_DCMOTOR, MeConstants.WRITEMODULE);
         initCommand(command);
         command.setElementCadena(COMMAND_PARAMETER_INDEX, Utils.intToByte(command.getIndex()));
         command.setElementCadena(COMMAND_PARAMETER_PORT, Utils.intToByte(port));
@@ -58,7 +60,7 @@ public class MeMotorDevice extends MeDevice {
 
     //Rotacion quieto
     public CommandSimple stop(){
-        CommandSimple command = new CommandSimple("Giro directo motor", 1, LENGTH_INSTRUCTION_DCMOTOR, MeConstants.WRITEMODULE);
+        CommandSimple command = new CommandSimple("Giro directo motor", index, LENGTH_INSTRUCTION_DCMOTOR, MeConstants.WRITEMODULE);
         initCommand(command);
         command.setElementCadena(COMMAND_PARAMETER_INDEX, Utils.intToByte(command.getIndex()));
         command.setElementCadena(COMMAND_PARAMETER_PORT, Utils.intToByte(port));

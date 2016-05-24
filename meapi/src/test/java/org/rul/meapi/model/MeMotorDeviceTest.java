@@ -30,7 +30,7 @@ public class MeMotorDeviceTest {
 
     @Test
     public void deviceMotor1GiroDirecto(){
-        MeMotorDevice motor1 = new MeMotorDevice("Motor 1 giro directo", MeConstants.PORT_M1);
+        MeMotorDevice motor1 = new MeMotorDevice("Motor 1 giro directo", MeConstants.PORT_M1, 2);
         CommandSimple command = motor1.giroDirecto(100);
         Assert.assertEquals(command.getCadena().length, command.checkByteCadena(COMMAND_GIRO_M1_DIRECTO) );
         Assert.assertTrue(command.isCadenaValid(COMMAND_GIRO_M1_DIRECTO));
@@ -38,7 +38,7 @@ public class MeMotorDeviceTest {
 
     @Test
     public void deviceMotor1GiroInverso(){
-        MeMotorDevice motor1 = new MeMotorDevice("Motor 1 giro inverso", MeConstants.PORT_M1);
+        MeMotorDevice motor1 = new MeMotorDevice("Motor 1 giro inverso", MeConstants.PORT_M1, 1);
         CommandSimple command = motor1.giroInverso(100);
         Assert.assertEquals(command.getCadena().length, command.checkByteCadena(COMMAND_GIRO_M1_INVERSO) );
         Assert.assertTrue(command.isCadenaValid(COMMAND_GIRO_M1_INVERSO));
@@ -46,7 +46,7 @@ public class MeMotorDeviceTest {
 
     @Test
     public void deviceMotor2GiroDirecto(){
-        MeMotorDevice motor2 = new MeMotorDevice("Motor 2 giro directo", MeConstants.PORT_M2);
+        MeMotorDevice motor2 = new MeMotorDevice("Motor 2 giro directo", MeConstants.PORT_M2, 2);
         CommandSimple command = motor2.giroDirecto(100);
         Assert.assertEquals(command.getCadena().length, command.checkByteCadena(COMMAND_GIRO_M2_DIRECTO) );
         Assert.assertTrue(command.isCadenaValid(COMMAND_GIRO_M2_DIRECTO));
@@ -54,7 +54,7 @@ public class MeMotorDeviceTest {
 
     @Test
     public void deviceMotor2GiroInverso(){
-        MeMotorDevice motor2 = new MeMotorDevice("Motor 2 giro inverso", MeConstants.PORT_M2);
+        MeMotorDevice motor2 = new MeMotorDevice("Motor 2 giro inverso", MeConstants.PORT_M2, 1);
         CommandSimple command = motor2.giroInverso(100);
         Assert.assertEquals(command.getCadena().length, command.checkByteCadena(COMMAND_GIRO_M2_INVERSO) );
         Assert.assertTrue(command.isCadenaValid(COMMAND_GIRO_M2_INVERSO));

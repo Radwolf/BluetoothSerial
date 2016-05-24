@@ -17,8 +17,8 @@ public class MeTransmission2MotorDevice {
     long timeForCell;
 
     public MeTransmission2MotorDevice(int portRight, int portLeft) {
-        motorRight = new MeMotorDevice("Motor right", portRight);
-        motorLeft = new MeMotorDevice("Motor left", portLeft);
+        motorRight = new MeMotorDevice("Motor right", portRight, 1);
+        motorLeft = new MeMotorDevice("Motor left", portLeft, 2);
     }
 
     public CommandSequence runForward(int speed){

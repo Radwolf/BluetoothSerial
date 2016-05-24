@@ -75,8 +75,8 @@ public class ConnectTest extends Activity {
             }
             createConnection();
             //sendData("a");
-            MeMotorDevice meMotorDeviceI = new MeMotorDevice("Prueba giro inverso", MeConstants.PORT_M1);
-            MeMotorDevice meMotorDeviceD = new MeMotorDevice("Prueba giro directo", MeConstants.PORT_M2);
+            MeMotorDevice meMotorDeviceI = new MeMotorDevice("Prueba giro inverso", MeConstants.PORT_M1, 1);
+            MeMotorDevice meMotorDeviceD = new MeMotorDevice("Prueba giro directo", MeConstants.PORT_M2, 2);
             CommandSimple commandSimpleI = meMotorDeviceI.giroInverso((byte) 156);
             tvLogsBluetooth.append("\n" + commandSimpleI.maskToString());
             sendData(commandSimpleI);
