@@ -2,9 +2,7 @@ package org.rul.meapi.model;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.rul.meapi.MeConstants;
 import org.rul.meapi.MeMatrixLedDevice;
-import org.rul.meapi.MeMotorDevice;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
