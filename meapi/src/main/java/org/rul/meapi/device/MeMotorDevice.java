@@ -1,9 +1,6 @@
-package org.rul.meapi;
+package org.rul.meapi.device;
 
 import org.rul.meapi.model.CommandSimple;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 /**
  * Created by rgonzalez on 20/05/2016.
@@ -33,37 +30,37 @@ public class MeMotorDevice extends MeDevice {
 
     protected void initCommand(CommandSimple command){
         super.initCommand(command);
-        command.setElementCadena(COMMAND_PARAMETER_LENGTH, Utils.intToByte(LENGTH_INSTRUCTION_DCMOTOR));
-        command.setElementCadena(COMMAND_PARAMETER_DEVICE, Utils.intToByte(MeConstants.DEV_DCMOTOR));
-        command.setElementCadena(COMMAND_PARAMETER_ACTION, Utils.intToByte(command.getType()));
+        command.setElementCadena(COMMAND_PARAMETER_LENGTH, org.rul.meapi.common.Utils.intToByte(LENGTH_INSTRUCTION_DCMOTOR));
+        command.setElementCadena(COMMAND_PARAMETER_DEVICE, org.rul.meapi.common.Utils.intToByte(org.rul.meapi.common.MeConstants.DEV_DCMOTOR));
+        command.setElementCadena(COMMAND_PARAMETER_ACTION, org.rul.meapi.common.Utils.intToByte(command.getType()));
     }
 
     //Rotacion sentido de las agujas del reloj
     public CommandSimple giroDirecto(int speed){
-        CommandSimple command = new CommandSimple("Giro directo motor", index, LENGTH_INSTRUCTION_DCMOTOR, MeConstants.WRITEMODULE);
+        CommandSimple command = new CommandSimple("Giro directo motor", index, LENGTH_INSTRUCTION_DCMOTOR, org.rul.meapi.common.MeConstants.WRITEMODULE);
         initCommand(command);
-        command.setElementCadena(COMMAND_PARAMETER_INDEX, Utils.intToByte(command.getIndex()));
-        command.setElementCadena(COMMAND_PARAMETER_PORT, Utils.intToByte(port));
+        command.setElementCadena(COMMAND_PARAMETER_INDEX, org.rul.meapi.common.Utils.intToByte(command.getIndex()));
+        command.setElementCadena(COMMAND_PARAMETER_PORT, org.rul.meapi.common.Utils.intToByte(port));
         setSpeedToCommand(command, speed);
         return command;
     }
 
     //Rotacion sentido inverso a las agujas del reloj
     public CommandSimple giroInverso(int speed){
-        CommandSimple command = new CommandSimple("Giro directo motor", index, LENGTH_INSTRUCTION_DCMOTOR, MeConstants.WRITEMODULE);
+        CommandSimple command = new CommandSimple("Giro directo motor", index, LENGTH_INSTRUCTION_DCMOTOR, org.rul.meapi.common.MeConstants.WRITEMODULE);
         initCommand(command);
-        command.setElementCadena(COMMAND_PARAMETER_INDEX, Utils.intToByte(command.getIndex()));
-        command.setElementCadena(COMMAND_PARAMETER_PORT, Utils.intToByte(port));
+        command.setElementCadena(COMMAND_PARAMETER_INDEX, org.rul.meapi.common.Utils.intToByte(command.getIndex()));
+        command.setElementCadena(COMMAND_PARAMETER_PORT, org.rul.meapi.common.Utils.intToByte(port));
         setSpeedToCommand(command, speed * -1);
         return command;
     }
 
     //Rotacion quieto
     public CommandSimple stop(){
-        CommandSimple command = new CommandSimple("Giro directo motor", index, LENGTH_INSTRUCTION_DCMOTOR, MeConstants.WRITEMODULE);
+        CommandSimple command = new CommandSimple("Giro directo motor", index, LENGTH_INSTRUCTION_DCMOTOR, org.rul.meapi.common.MeConstants.WRITEMODULE);
         initCommand(command);
-        command.setElementCadena(COMMAND_PARAMETER_INDEX, Utils.intToByte(command.getIndex()));
-        command.setElementCadena(COMMAND_PARAMETER_PORT, Utils.intToByte(port));
+        command.setElementCadena(COMMAND_PARAMETER_INDEX, org.rul.meapi.common.Utils.intToByte(command.getIndex()));
+        command.setElementCadena(COMMAND_PARAMETER_PORT, org.rul.meapi.common.Utils.intToByte(port));
         setSpeedToCommand(command, 0);
         return command;
     }

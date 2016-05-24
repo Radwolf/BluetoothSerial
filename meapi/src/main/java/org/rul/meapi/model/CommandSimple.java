@@ -1,6 +1,6 @@
 package org.rul.meapi.model;
 
-import org.rul.meapi.Utils;
+import org.rul.meapi.common.Utils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

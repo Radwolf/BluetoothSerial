@@ -1,9 +1,7 @@
-package org.rul.meapi;
+package org.rul.meapi.device;
 
 import org.rul.meapi.model.CommandSequence;
 import org.rul.meapi.model.CommandTimmer;
-
-import java.util.Calendar;
 
 /**
  * Created by rgonzalez on 20/05/2016.
@@ -60,7 +58,7 @@ public class MeTransmission2MotorDevice {
         CommandSequence commandSequence = new CommandSequence("Forward one cell");
         commandSequence.addCommand(motorRight.giroDirecto(speedForCell));
         commandSequence.addCommand(motorLeft.giroInverso(speedForCell));
-        commandSequence.addCommand(new CommandTimmer("Tiempo de desplazamiento calibrado", MeConstants.WRITEMODULE, 3, timeForCell));
+        commandSequence.addCommand(new CommandTimmer("Tiempo de desplazamiento calibrado", org.rul.meapi.common.MeConstants.WRITEMODULE, 3, timeForCell));
         commandSequence.addCommand(motorRight.stop());
         commandSequence.addCommand(motorLeft.stop());
         return commandSequence;

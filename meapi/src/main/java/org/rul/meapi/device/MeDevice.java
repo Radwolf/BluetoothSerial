@@ -1,4 +1,4 @@
-package org.rul.meapi;
+package org.rul.meapi.device;
 
 import org.rul.meapi.model.CommandSimple;
 

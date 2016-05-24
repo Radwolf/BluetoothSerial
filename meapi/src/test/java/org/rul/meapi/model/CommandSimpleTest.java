@@ -3,7 +3,7 @@ package org.rul.meapi.model;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.rul.meapi.MeConstants;
+import org.rul.meapi.common.MeConstants;
 
 /**
  * Created by rgonzalez on 20/05/2016.

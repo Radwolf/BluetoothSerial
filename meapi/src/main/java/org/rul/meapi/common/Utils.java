@@ -1,4 +1,4 @@
-package org.rul.meapi;
+package org.rul.meapi.common;
 
 /**
  * Created by rgonzalez on 10/05/2016.
