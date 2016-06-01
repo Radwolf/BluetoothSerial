@@ -1,5 +1,6 @@
 package org.rul.bluetoothserial;
 
+/*
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Calendar;
@@ -26,11 +27,46 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.rul.meapi.common.MeConstants;
-import org.rul.meapi.device.MeMatrixLedDevice;
 import org.rul.meapi.device.MeMotorDevice;
 import org.rul.meapi.model.CommandSimple;
+*/
 
-public class ConnectTest extends Activity {
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.rul.meapi.model.CommandSimple;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+@TargetApi(21)
+public class ConnectTestPruebas extends Activity {
     private static final String TAG = "ConnectTest";
     TextView tvLogsBluetooth;
     // Well known SPP UUID
@@ -40,6 +76,7 @@ public class ConnectTest extends Activity {
     // Insert your bluetooth devices MAC address
     private static String address = "00:07:02:03:10:A3";
     private OutputStream outStream = null;
+/*
 
     ImageButton buttonForward;
     ImageButton buttonLeft;
@@ -53,9 +90,9 @@ public class ConnectTest extends Activity {
     private CommandSimple commandSimple;
 
 
-    /**
+    *//**
      * Called when the activity is first created.
-     */
+     *//*
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,16 +116,14 @@ public class ConnectTest extends Activity {
             }
             createConnection();
             //sendData("a");
-            MeMatrixLedDevice meMatrixLedDevice = new MeMatrixLedDevice("Matrix", 1);
-//            CommandSimple commandSimple = meMatrixLedDevice.pintarFace("Corazon");
-//            MeMotorDevice meMotorDeviceI = new MeMotorDevice("Prueba giro inverso", MeConstants.PORT_M1, 1);
-//            MeMotorDevice meMotorDeviceD = new MeMotorDevice("Prueba giro directo", MeConstants.PORT_M2, 2);
-//            CommandSimple commandSimpleI = meMotorDeviceI.giroInverso((byte) 156);
-//            tvLogsBluetooth.append("\n" + commandSimpleI.maskToString());
-//            sendData(commandSimpleI);
-//            CommandSimple commandSimpleD = meMotorDeviceD.giroDirecto((byte) 100);
-//            tvLogsBluetooth.append("\n" + commandSimpleD.maskToString());
-//            sendData(commandSimple);
+            MeMotorDevice meMotorDeviceI = new MeMotorDevice("Prueba giro inverso", MeConstants.PORT_M1, 1);
+            MeMotorDevice meMotorDeviceD = new MeMotorDevice("Prueba giro directo", MeConstants.PORT_M2, 2);
+            CommandSimple commandSimpleI = meMotorDeviceI.giroInverso((byte) 156);
+            tvLogsBluetooth.append("\n" + commandSimpleI.maskToString());
+            sendData(commandSimpleI);
+            CommandSimple commandSimpleD = meMotorDeviceD.giroDirecto((byte) 100);
+            tvLogsBluetooth.append("\n" + commandSimpleD.maskToString());
+            sendData(commandSimpleD);
 //            MeMotorCommunication motorD = new MeMotorCommunication("MotorDerecho", MeModuleCommunication.PORT_M1);
 //            motorD.writeCommand(1, MeModuleCommunication.WRITEMODULE, 0, 100);
 //
@@ -114,7 +149,7 @@ public class ConnectTest extends Activity {
 //
 //        });
 
- /*       final MeMotorAPI motorAPI = new MeMotorAPI(MeModuleCommunication.PORT_M1, MeModuleCommunication.PORT_M2, 100, -100);
+ *//*       final MeMotorAPI motorAPI = new MeMotorAPI(MeModuleCommunication.PORT_M1, MeModuleCommunication.PORT_M2, 100, -100);
         buttonForward.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
@@ -277,7 +312,7 @@ public class ConnectTest extends Activity {
                 }
                 return true;
             }
-        });*/
+        });*//*
 
     }
 
@@ -381,6 +416,7 @@ public class ConnectTest extends Activity {
         }
     }
 
+*/
     private void errorExit(String title, String message) {
         Toast msg = Toast.makeText(getBaseContext(),
                 title + " - " + message, Toast.LENGTH_SHORT);
@@ -406,4 +442,243 @@ public class ConnectTest extends Activity {
         }
     }
 
+    private BluetoothAdapter mBluetoothAdapter;
+    private int REQUEST_ENABLE_BT = 1;
+    private Handler mHandler;
+    private static final long SCAN_PERIOD = 10000;
+    private BluetoothLeScanner mLEScanner;
+    private ScanSettings settings;
+    private List<ScanFilter> filters;
+    private BluetoothGatt mGatt;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        tvLogsBluetooth = (TextView) findViewById(R.id.out);
+
+
+        mHandler = new Handler();
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Toast.makeText(this, "BLE Not Supported",
+                    Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        final BluetoothManager bluetoothManager =
+                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        } else {
+            if (Build.VERSION.SDK_INT >= 21) {
+                mLEScanner = mBluetoothAdapter.getBluetoothLeScanner();
+                settings = new ScanSettings.Builder()
+                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                        .build();
+                filters = new ArrayList<ScanFilter>();
+            }
+            scanLeDevice(true);
+            if (mBluetoothAdapter.isEnabled()) {
+                Set<BluetoothDevice> devices = mBluetoothAdapter.getBondedDevices();
+                for (BluetoothDevice device : devices) {
+                    tvLogsBluetooth.append(String.format("\n%s (%s)", device.getName(), device.getAddress()));
+                    if(address.equals(device.getAddress())){
+                        connectToDevice(device);
+                    }
+                }
+            }
+            writeSingleBuffer();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()) {
+            scanLeDevice(false);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mGatt == null) {
+            return;
+        }
+        mGatt.close();
+        mGatt = null;
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_ENABLE_BT) {
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Bluetooth not enabled.
+                finish();
+                return;
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void scanLeDevice(final boolean enable) {
+        if (enable) {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (Build.VERSION.SDK_INT < 21) {
+                        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                    } else {
+                        mLEScanner.stopScan(mScanCallback);
+
+                    }
+                }
+            }, SCAN_PERIOD);
+            if (Build.VERSION.SDK_INT < 21) {
+                mBluetoothAdapter.startLeScan(mLeScanCallback);
+            } else {
+                mLEScanner.startScan(filters, settings, mScanCallback);
+            }
+        } else {
+            if (Build.VERSION.SDK_INT < 21) {
+                mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            } else {
+                mLEScanner.stopScan(mScanCallback);
+            }
+        }
+    }
+
+
+    private ScanCallback mScanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            Log.i("callbackType", String.valueOf(callbackType));
+            Log.i("result", result.toString());
+            BluetoothDevice btDevice = result.getDevice();
+            connectToDevice(btDevice);
+        }
+
+        @Override
+        public void onBatchScanResults(List<ScanResult> results) {
+            for (ScanResult sr : results) {
+                Log.i("ScanResult - Results", sr.toString());
+            }
+        }
+
+        @Override
+        public void onScanFailed(int errorCode) {
+            Log.e("Scan Failed", "Error Code: " + errorCode);
+        }
+    };
+
+    private BluetoothAdapter.LeScanCallback mLeScanCallback =
+            new BluetoothAdapter.LeScanCallback() {
+                @Override
+                public void onLeScan(final BluetoothDevice device, int rssi,
+                                     byte[] scanRecord) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.i("onLeScan", device.toString());
+                            connectToDevice(device);
+                        }
+                    });
+                }
+            };
+
+    public void connectToDevice(BluetoothDevice device) {
+        if (mGatt == null) {
+            mGatt = device.connectGatt(this, false, gattCallback);
+            scanLeDevice(false);// will stop after first device detection
+        }
+    }
+
+    private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
+        @Override
+        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            Log.i("onConnectionStateChange", "Status: " + status);
+            switch (newState) {
+                case BluetoothProfile.STATE_CONNECTED:
+                    Log.i("gattCallback", "STATE_CONNECTED");
+                    gatt.discoverServices();
+                    break;
+                case BluetoothProfile.STATE_DISCONNECTED:
+                    Log.e("gattCallback", "STATE_DISCONNECTED");
+                    break;
+                default:
+                    Log.e("gattCallback", "STATE_OTHER");
+            }
+
+        }
+
+        @Override
+        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            List<BluetoothGattService> services = gatt.getServices();
+            Log.i("onServicesDiscovered", services.toString());
+            gatt.readCharacteristic(services.get(1).getCharacteristics().get
+                    (0));
+        }
+
+        @Override
+        public void onCharacteristicRead(BluetoothGatt gatt,
+                                         BluetoothGattCharacteristic
+                                                 characteristic, int status) {
+            Log.i("onCharacteristicRead", characteristic.toString());
+            gatt.disconnect();
+        }
+    };
+
+    public boolean writeSingleBuffer(){
+        BluetoothGattCharacteristic ch = characteristicForProperty(BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE);
+        if(ch!=null){
+                ch.setValue(new byte[]{(byte) 0xff, (byte)0x55, (byte)0x06, (byte)0x02, (byte)0x02, (byte)0x0a, (byte)0x09, (byte)0x64, (byte)0x00});
+                mGatt.writeCharacteristic(ch);
+                return true;
+//			String hexStr="";
+//			for(int i1=0;i1<buf.length;i1++){
+//				hexStr+=String.format("%02X ", buf[i1]);
+//			}
+        }
+        return false;
+    }
+
+    private BluetoothGattCharacteristic characteristicForProperty(int property){
+        if (mGatt == null) return null;
+        List<BluetoothGattService> list = (List<BluetoothGattService>)(mGatt.getServices());
+        if (list == null) return null;
+        for (BluetoothGattService gattService : list) {
+            //-----Service的字段信息-----//
+            int type = gattService.getType();
+            String uuid = gattService.getUuid().toString();
+            //-----Characteristics的字段信息-----//
+            List<BluetoothGattCharacteristic> gattCharacteristics =gattService.getCharacteristics();
+            for (final BluetoothGattCharacteristic  gattCharacteristic: gattCharacteristics) {
+
+                int permission = gattCharacteristic.getPermissions();
+
+                int properties = gattCharacteristic.getProperties();
+//                Log.d("mb","---->char property:"+Utils.getCharPropertie(property)+" - "+(property&BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)+" - "+BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE);
+                int p = (property&properties);
+                int np = property;
+                if(np==p){
+                    if(np==(int)(BluetoothGattCharacteristic.PROPERTY_WRITE|BluetoothGattCharacteristic.PROPERTY_READ)){
+                        //UUID_KEY_DATA是可以跟蓝牙模块串口通信的Characteristic
+                        if((int)(uuid.indexOf("ffe4"))>0){
+                            return gattCharacteristic;
+                        }
+                    }else{
+                        return gattCharacteristic;
+                    }
+                }
+            }
+        }//
+        return null;
+    }
 }

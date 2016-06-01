@@ -25,7 +25,7 @@ public class MeConstants {
     public static final int DEV_BUTTON = 18;
     public static final int DEV_LIMITSWITCH = 19;
     public static final int DEV_SHUTTER = 20;
-    public static final int DEV_MATRIX_LED = 29;  //matrix  ff 55 17 00 02 29 01 02 [00 00 00 00 40 48 44 42 02 02 02 02 42 44 48 40 00 00]
+    public static final int DEV_MATRIX_LED = 41;  //TODO: Como controlar el int to byte deberia de ser el dispositivo 29 en byte (41 en int)
     public static final int DEV_PINDIGITAL = 30;
     public static final int DEV_PINANALOG = 31;
     public static final int DEV_PINPWM = 32;

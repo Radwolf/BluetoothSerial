@@ -1,4 +1,4 @@
-package org.rul.meapi.service;
+package org.rul.bluetoothserial.service;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -6,7 +6,6 @@ import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInsta
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -29,7 +28,7 @@ import java.util.List;
 public class GoogleSheetsService {
     /** Application name. */
     private static final String APPLICATION_NAME =
-            "Google Sheets API";
+            "Google sheets Android";
 
     /** Directory to store user credentials for this application. */
     private static final java.io.File DATA_STORE_DIR = new java.io.File(
@@ -55,7 +54,8 @@ public class GoogleSheetsService {
 
     static {
         try {
-            HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+            //HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+            HTTP_TRANSPORT = AndroidHttp.newCompatibleTransport();
             DATA_STORE_FACTORY = new FileDataStoreFactory(DATA_STORE_DIR);
         } catch (Throwable t) {
             t.printStackTrace();
@@ -71,7 +71,7 @@ public class GoogleSheetsService {
     public static Credential authorize() throws IOException {
         // Load client secrets.
         InputStream in =
-                GoogleSheetsService.class.getResourceAsStream("/client_secret_api.json");
+                GoogleSheetsService.class.getResourceAsStream("/client_secret.json");
         GoogleClientSecrets clientSecrets =
                 GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
