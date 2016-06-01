@@ -32,22 +32,34 @@ package org.rul.bluetoothserial;
         import android.content.Context;
         import android.content.Intent;
         import android.content.SharedPreferences;
+        import android.content.pm.PackageManager;
+        import android.graphics.drawable.AnimationDrawable;
         import android.net.ConnectivityManager;
         import android.net.NetworkInfo;
         import android.os.AsyncTask;
         import android.os.Bundle;
+        import android.os.Handler;
+        import android.os.Message;
         import android.support.annotation.NonNull;
         import android.text.TextUtils;
         import android.text.method.ScrollingMovementMethod;
         import android.util.Log;
+        import android.view.MenuItem;
         import android.view.View;
         import android.view.ViewGroup;
+        import android.widget.ArrayAdapter;
         import android.widget.Button;
         import android.widget.ImageButton;
         import android.widget.LinearLayout;
+        import android.widget.PopupWindow;
         import android.widget.TextView;
         import android.widget.Toast;
 
+        import org.rul.bluetoothserial.adapter.DeviceListAdapter;
+        import org.rul.bluetoothserial.bluetooth.Bluetooth;
+        import org.rul.bluetoothserial.bluetooth.BluetoothLE;
+        import org.rul.bluetoothserial.bluetooth.MeTimer;
+        import org.rul.meapi.common.MeConstants;
         import org.rul.meapi.device.MeMatrixLedDevice;
         import org.rul.meapi.model.CommandSimple;
 
@@ -59,6 +71,8 @@ package org.rul.bluetoothserial;
         import java.util.Arrays;
         import java.util.List;
         import java.util.Set;
+        import java.util.Timer;
+        import java.util.TimerTask;
         import java.util.UUID;
 
         import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -66,6 +80,7 @@ package org.rul.bluetoothserial;
 
 public class MainActivity extends Activity
         implements EasyPermissions.PermissionCallbacks {
+    static final String dbg = "LayoutView";
     GoogleAccountCredential mCredential;
     private TextView mOutputText;
     private Button mCallApiButton;
@@ -100,6 +115,28 @@ public class MainActivity extends Activity
     private BluetoothSocket btSocket = null;
 
     private ByteBuffer cadenaExcel = null;
+
+
+    static float firmVersion = 0f;
+
+    // bluetooth related
+    MenuItem blticon;
+    Bluetooth blt;
+    PopupWindow popupBtSelect;
+    DeviceListAdapter devAdapter;
+    ArrayAdapter<String> pairAdapter;
+    ProgressDialog uploadPb;
+
+    // Mscript related
+    static final int STAGE_IDLE = 0; // the layout is editable in this state
+    static final int STAGE_PROBING = 1;
+    static final int STAGE_DONWLOAD_PROCESS = 2;
+    static final int STAGE_DONWLOAD_FIN = 2;
+    static final int STAGE_RUN = 4;
+    int engineState = STAGE_IDLE;
+    Timer mTimer;
+    TimerTask mTimerTask;
+
     /**
      * Create the main activity.
      * @param savedInstanceState previously saved instance data.
@@ -110,7 +147,11 @@ public class MainActivity extends Activity
         Log.d(TAG, "In onCreate()");
 
         setContentView(R.layout.activity_main);
-
+        tvLogsBluetooth = (TextView) findViewById(R.id.out);
+        buttonForward = (ImageButton) findViewById(R.id.buttonForward);
+        buttonLeft = (ImageButton) findViewById(R.id.buttonLeft);
+        buttonRight = (ImageButton) findViewById(R.id.buttonRight);
+        buttonBackward = (ImageButton) findViewById(R.id.buttonBackward);
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("Calling Google Sheets API ...");
 
@@ -118,6 +159,30 @@ public class MainActivity extends Activity
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
+
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            blt = Bluetooth.sharedManager();
+            blt.mHandler = mHandler;
+            devAdapter = new DeviceListAdapter(this,blt.getBtDevList(),R.layout.device_list_item);
+        }else{
+            BluetoothLE.sharedManager().setup(this);
+            BluetoothLE.sharedManager().leHandler = mLeHandler;
+            devAdapter = new DeviceListAdapter(this,BluetoothLE.sharedManager().getDeviceList(),R.layout.device_list_item);
+            MeTimer.startWrite();
+        }
+
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
+        Set<BluetoothDevice> devices = btAdapter.getBondedDevices();
+        checkBTState();
+        if (btAdapter.isEnabled()) {
+            for (BluetoothDevice device : devices) {
+                tvLogsBluetooth.append(String.format("\n%s (%s)", device.getName(), device.getAddress()));
+            }
+            //Controlar si hemos conectado antes de enviar
+            createConnection();
+            getResultsFromApi("1jCvYSZTdo5_FheTGDo9zD6t1Rqb3yBIs3cHayob29Ns", "A1:P8", "Erik");
+
+        }
 //        LinearLayout activityLayout = new LinearLayout(this);
 //        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
 //                LinearLayout.LayoutParams.MATCH_PARENT,
@@ -152,24 +217,9 @@ public class MainActivity extends Activity
 //                "Click the \'" + BUTTON_TEXT +"\' button to test the API.");
 //        activityLayout.addView(mOutputText);
 
-        tvLogsBluetooth = (TextView) findViewById(R.id.out);
-        buttonForward = (ImageButton) findViewById(R.id.buttonForward);
-        buttonLeft = (ImageButton) findViewById(R.id.buttonLeft);
-        buttonRight = (ImageButton) findViewById(R.id.buttonRight);
-        buttonBackward = (ImageButton) findViewById(R.id.buttonBackward);
 
-        btAdapter = BluetoothAdapter.getDefaultAdapter();
-        Set<BluetoothDevice> devices = btAdapter.getBondedDevices();
-        checkBTState();
-        if (btAdapter.isEnabled()) {
-            for (BluetoothDevice device : devices) {
-                tvLogsBluetooth.append(String.format("\n%s (%s)", device.getName(), device.getAddress()));
-            }
-            //Controlar si hemos conectado antes de enviar
-            createConnection();
-            getResultsFromApi("1jCvYSZTdo5_FheTGDo9zD6t1Rqb3yBIs3cHayob29Ns", "A1:P8", "Erik");
 
-        }
+
     }
 
 
@@ -594,6 +644,316 @@ public class MainActivity extends Activity
             msg = msg + ".\n\nCheck that the SPP UUID: " + MY_UUID.toString() + " exists on server.\n\n";
 
             errorExit("Fatal Error", msg);
+        }
+    }
+
+    // --------------- BULETOOTH BELOW ---------------------
+    final Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg){
+            switch(msg.what){
+                case Bluetooth.MSG_CONNECTED:
+                {
+                    devListChanged();
+                    blticon.setIcon(R.drawable.bluetooth_on);
+                    Intent intent = new Intent(MainActivity.this,DialogActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("msg", getString(R.string.connected));
+                    startActivity(intent);
+                    firmVersion = 0.0f;
+                    startTimer(1000);
+                }
+                break;
+                case Bluetooth.MSG_DISCONNECTED:
+                    stopTimer();
+                    devListChanged();
+                    blticon.setIcon(R.drawable.bluetooth_off);
+                    break;
+                case Bluetooth.MSG_CONNECT_FAIL:
+                {
+                    Intent intent = new Intent(MainActivity.this,DialogActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("msg", getString(R.string.connectfail));
+                    startActivity(intent);
+                    Log.d(dbg,"connect fail");
+                }
+                break;
+                case Bluetooth.MSG_RX:
+                    int[] rx = (int[]) msg.obj;
+                    parseMsg(rx);
+                    break;
+                case Bluetooth.MSG_FOUNDDEVICE:
+                    devListChanged();
+                    break;
+                case Bluetooth.MSG_DISCOVERY_FINISHED:{
+                    if(btnRefresh!=null){
+                        AnimationDrawable d=(AnimationDrawable)btnRefresh.getCompoundDrawables()[0];
+                        d.stop();
+                    }
+                }
+                break;
+                case MeConstants.MSG_VALUECHANGED:
+                    byte[] cmd = (byte[]) msg.obj;
+                    if(blt!=null){
+                        blt.bluetoothWrite(cmd);
+                    }else{
+                        BluetoothLE.sharedManager().writeBuffer(cmd);
+                    }
+                    break;
+            }
+        }
+    };
+    final Handler mLeHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg){
+            switch(msg.what){
+                case BluetoothLE.MSG_CONNECTED:
+                {
+                    devLEListChanged();
+                    blticon.setIcon(R.drawable.bluetooth_on);
+                    Intent intent = new Intent(MainActivity.this,DialogActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("msg", getString(R.string.connected));
+                    startActivity(intent);
+                    firmVersion = 0.0f;
+                    startTimer(1000);
+                }
+                break;
+                case BluetoothLE.MSG_DISCONNECTED:
+                    stopTimer();
+                    devLEListChanged();
+                    blticon.setIcon(R.drawable.bluetooth_off);
+                    break;
+                case BluetoothLE.MSG_CONNECT_FAIL:
+                {
+                    Intent intent = new Intent(MainActivity.this,DialogActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("msg", getString(R.string.connectfail));
+                    startActivity(intent);
+                    Log.d(dbg,"connect fail");
+                }
+                break;
+                case BluetoothLE.MSG_SCAN_START:{
+                    if(btnRefresh!=null){
+                        AnimationDrawable d=(AnimationDrawable)btnRefresh.getCompoundDrawables()[0];
+                        d.start();
+                    }
+                }
+                break;
+                case BluetoothLE.MSG_SCAN_END:{
+                    if(btnRefresh!=null){
+                        AnimationDrawable d=(AnimationDrawable)btnRefresh.getCompoundDrawables()[0];
+                        d.stop();
+                    }
+                }
+                break;
+                case BluetoothLE.MSG_RX:
+                    int[] rx = (int[]) msg.obj;
+                    parseMsg(rx);
+                    break;
+                case BluetoothLE.MSG_FOUNDDEVICE:
+                    devLEListChanged();
+                    break;
+                case BluetoothLE.MSG_DISCOVERY_FINISHED:{
+                    if(btnRefresh!=null){
+                        AnimationDrawable d=(AnimationDrawable)btnRefresh.getCompoundDrawables()[0];
+                        d.stop();
+                    }
+                }
+                break;
+                case BluetoothLE.MSG_CONNECTING:{
+                    Intent intent =new Intent(MainActivity.this,DialogActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("msg", getString(R.string.connecting));
+                    startActivity(intent);
+                }
+                break;
+                case MeConstants.MSG_VALUECHANGED:
+                    byte[] cmd = (byte[]) msg.obj;
+                    BluetoothLE.sharedManager().writeBuffer(cmd);
+                    break;
+            }
+        }
+    };
+
+    public void devListChanged(){
+        if(blt!=null){
+            devAdapter.updateData (blt.getBtDevList());
+            devAdapter.notifyDataSetChanged();
+        }
+    }
+    public void devLEListChanged(){
+        List<String> list = BluetoothLE.sharedManager().getDeviceList();
+        if(devAdapter!=null){
+            devAdapter.updateData (list);
+            devAdapter.notifyDataSetChanged();
+        }
+    }
+
+    void startTimer(int interval){
+        if(mTimerTask == null){
+            mTimerTask = new TimerTask(){
+                @Override
+                public void run() {
+                    /*if(engineState==STAGE_PROBING){
+                        byte[] queryStr = firmup.getProbeCmd();
+                        if(queryStr!=null){
+                            if(blt!=null){
+                                blt.bluetoothWrite(queryStr);
+                            }else{
+                                BluetoothLE.sharedManager().resetIO(queryStr);
+                            }
+                        }
+                    }else */
+                    if(engineState==STAGE_RUN){
+                        byte[] queryStr = getQueryString();
+                        if(queryStr!=null){
+                            if(blt!=null){
+                                blt.bluetoothWrite(queryStr);
+                            }else{
+                                BluetoothLE.sharedManager().writeBuffer(queryStr);
+                            }
+                        }
+                    }else if(engineState==STAGE_IDLE){
+                        queryVersion();
+                    }
+                }
+            };
+            if(mTimerTask !=null){
+                mTimer = new Timer(true);
+                mTimer.schedule(mTimerTask,600,interval);
+            }
+        }
+    }
+
+    void stopTimer(){
+        if(mTimer!=null){
+            mTimer.cancel();
+            mTimer=null;
+        }
+
+        if(mTimerTask != null){
+            mTimerTask.cancel();
+            mTimerTask = null;
+        }
+    }
+
+    byte[] getQueryString()
+    {
+        //TODO: Aquí hay que poner el tratamiento para procesar las cadenas de comandos
+//        if(queryListIndex>=layout.moduleList.size()){
+//            return null;
+//        }
+//        MeModule mod = layout.moduleList.get(queryListIndex);
+//        byte[] query = mod.getQuery(queryListIndex);
+//        if(query==null){
+//            queryListIndex++;
+//            if(queryListIndex==layout.moduleList.size()){
+//                queryListIndex = 0;
+//                return null;
+//            }
+//            return getQueryString();
+//        }
+//        queryListIndex++;
+//        if(queryListIndex==layout.moduleList.size()){
+//            queryListIndex = 0;
+//        }
+//        return query;
+
+        return null;
+    }
+
+    void queryVersion(){
+        //Log.d("mb", "queryVersion");
+        byte[] cmd = new byte[7];
+        //a[8]={0xff,0x55,len,VERSION_INDEX,action,device,'\n'};
+        cmd[0]=(byte) 0xff;
+        cmd[1]=(byte) 0x55;
+        cmd[2]=(byte) 3;
+        cmd[3]=(byte) MeConstants.VERSION_INDEX;
+        cmd[4]=(byte) MeConstants.READMODULE;
+        cmd[5]=(byte) 0;
+        cmd[6]=(byte) '\n';
+        if(blt!=null){
+            blt.bluetoothWrite(cmd);
+        }else{
+            BluetoothLE.sharedManager().writeBuffer(cmd);
+        }
+    }
+
+    void parseMsg(int[] msg){
+
+//			Log.d("mb", "parseMSG:"+msg.length);
+        if(engineState==STAGE_PROBING){
+            engineState = STAGE_DONWLOAD_PROCESS;
+            stopTimer();
+            int ret = firmup.parseCmd(msg);
+            //if(ret>0) stopTimer();
+            //firmup.loadFirm();
+            firmup.startDownload();
+            uploadPb.setMessage("Found Orion, now downloading");
+            byte[] tosend = firmup.getHexPage();
+            if(tosend!=null){
+                if(blt!=null){
+                    blt.bluetoothWrite(tosend);
+                }else{
+                    MeTimer.delayWrite(tosend,10);
+                }
+            }
+        }else if(engineState == STAGE_DONWLOAD_PROCESS){
+            byte[] tosend = firmup.getHexPage();
+            if(tosend!=null){
+                int percent = firmup.getDowningProcess();
+                uploadPb.setMessage(getString(R.string.Upgrading)+" "+percent+"%");
+                if(blt!=null){
+                    blt.bluetoothWrite(tosend);
+                }else{
+                    MeTimer.delayWrite(tosend, 100);
+                }
+                if(percent==100){
+                    firmVersion = 1.1f;
+                    uploadPb.dismiss();
+                }
+            }
+        }else if(msg.length>2){
+            if((msg[2]&0xff)==MeModule.VERSION_INDEX){
+                int len = msg[4];
+                String hexStr="";
+                for(int i=0;i<len;i++){
+                    hexStr+=String.format("%c", msg[5+i]);
+                }
+                Log.d("mb","version:"+hexStr);
+                firmVersion = 1.1f;
+                if(engineState==STAGE_IDLE){
+                    stopTimer();
+                }
+            }else{
+                int moduleIndex = msg[2];
+                if(msg.length<7) return;
+                float f = 0.0f;
+                if(msg[3]==2){
+                    if(msg.length>7){
+                        int tint = (msg[4]&0xff)+((msg[5]&0xff)<<8)+((msg[6]&0xff)<<16)+((msg[7]&0xff)<<24);
+                        f = Float.intBitsToFloat(tint);
+                    }
+                }else if(msg[3]==1){
+                    f = (msg[4]&0xff);
+                }else if(msg[3]==3){
+                    f = (msg[4]&0xff)+((msg[5]&0xff)<<8);
+                }
+                if(moduleIndex<0 || moduleIndex>layout.moduleList.size()){
+                    return;
+                }
+                //rx:FF 55 04 04 07 31 2E 31 2E 31 30 32 0D 0A
+
+                if(moduleIndex<layout.moduleList.size()){
+                    MeModule mod = layout.moduleList.get(moduleIndex);
+                    mod.setEchoValue(""+f);
+                }
+
+            }
+        }else if(msg.length<3){
+            return;
         }
     }
 }

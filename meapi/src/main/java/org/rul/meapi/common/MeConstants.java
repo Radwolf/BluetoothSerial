@@ -39,6 +39,9 @@ public class MeConstants {
     public static final int READMODULE = 1;
     public static final int WRITEMODULE = 2;
 
+    public static final int VERSION_INDEX = 0xfa;
+    public static final int MSG_VALUECHANGED = 0x10;
+
     public static final int PORT_NULL = 0;
     public static final int PORT_1 = 1;
     public static final int PORT_2 = 2;
