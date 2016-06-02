@@ -68,6 +68,7 @@ import org.rul.bluetoothserial.bluetooth.BluetoothLE;
 import org.rul.bluetoothserial.bluetooth.MeTimer;
 import org.rul.meapi.common.MeConstants;
 import org.rul.meapi.device.MeMatrixLedDevice;
+import org.rul.meapi.device.MeMotorDevice;
 import org.rul.meapi.model.CommandSimple;
 
 import java.io.IOException;
@@ -109,8 +110,8 @@ public class MainActivity extends Activity
             UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     // Insert your bluetooth devices MAC address
-    //private static String address = "00:07:02:03:10:A3";  //Address mbot
-    private static String address = "00:80:5A:46:22:50";  //address pen bluetooth
+    private static String address = "00:07:02:03:10:A3";  //Address mbot
+//    private static String address = "00:80:5A:46:22:50";  //address pen bluetooth
     private OutputStream outStream = null;
 
     ImageButton buttonForward;
@@ -192,6 +193,13 @@ public class MainActivity extends Activity
             MeTimer.startWrite();
             BluetoothLE.sharedManager().selectDevice(address);
             System.out.println(BluetoothLE.sharedManager().isConnected());
+
+            MeMotorDevice meMotorDeviceI = new MeMotorDevice("Prueba giro inverso", MeConstants.PORT_M1, 1);
+            MeMotorDevice meMotorDeviceD = new MeMotorDevice("Prueba giro directo", MeConstants.PORT_M2, 2);
+            CommandSimple commandSimpleI = meMotorDeviceI.giroInverso((byte) 156);
+
+            BluetoothLE.sharedManager().writeBuffer(commandSimpleI.getCadena());
+            BluetoothLE.sharedManager().writeSingleBuffer();
         }
 
 
@@ -1024,7 +1032,7 @@ public class MainActivity extends Activity
             return;
         }
     }
-
+/*
     void showBtSelect(){
         if(blt==null){
             BluetoothLE.sharedManager().start();
@@ -1110,7 +1118,7 @@ public class MainActivity extends Activity
                         if(blt!=null){
                             if(blt.connDev!=null){
                                 engineState = STAGE_RUN;
-                      /*  if(firmVersion==0){
+                      *//*  if(firmVersion==0){
                             stopTimer(); // stop previous version probing timer
                             Log.d("firmversion", "UNKNOW");
                             showUpgradeDialog();
@@ -1118,19 +1126,19 @@ public class MainActivity extends Activity
                         stopTimer();
                         startTimer(200);
                         enableAllModule();
-                        runBtn.setImageResource(R.drawable.pause_button);*/
+                        runBtn.setImageResource(R.drawable.pause_button);*//*
                             }
                         }else{
                             if(BluetoothLE.sharedManager().isConnected()){
                                 engineState = STAGE_RUN;
-                        /*if(firmVersion==0){
+                        *//*if(firmVersion==0){
                             stopTimer(); // stop previous version probing timer
                             Log.d("firmversion", "UNKNOW");
                             showUpgradeDialog();
                         }
                         stopTimer();
                         startTimer(200);
-                        enableAllModule();*/
+                        enableAllModule();*//*
                                 runBtn.setImageResource(R.drawable.pause_button);
                             }
                         }
@@ -1140,5 +1148,5 @@ public class MainActivity extends Activity
 
         }, 100L);
 
-    }
+    }*/
 }
