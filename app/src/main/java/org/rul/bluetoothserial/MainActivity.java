@@ -5,78 +5,85 @@ package org.rul.bluetoothserial;
  */
 
 
-        import com.google.android.gms.common.ConnectionResult;
-        import com.google.android.gms.common.GoogleApiAvailability;
-        import com.google.api.client.extensions.android.http.AndroidHttp;
-        import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-        import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
-        import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 
-        import com.google.api.client.http.HttpTransport;
-        import com.google.api.client.json.JsonFactory;
-        import com.google.api.client.json.jackson2.JacksonFactory;
-        import com.google.api.client.util.ExponentialBackOff;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.ExponentialBackOff;
 
-        import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.SheetsScopes;
 
-        import com.google.api.services.sheets.v4.model.*;
+import com.google.api.services.sheets.v4.model.*;
 
-        import android.Manifest;
-        import android.accounts.AccountManager;
-        import android.app.Activity;
-        import android.app.Dialog;
-        import android.app.ProgressDialog;
-        import android.bluetooth.BluetoothAdapter;
-        import android.bluetooth.BluetoothDevice;
-        import android.bluetooth.BluetoothSocket;
-        import android.content.Context;
-        import android.content.Intent;
-        import android.content.SharedPreferences;
-        import android.content.pm.PackageManager;
-        import android.graphics.drawable.AnimationDrawable;
-        import android.net.ConnectivityManager;
-        import android.net.NetworkInfo;
-        import android.os.AsyncTask;
-        import android.os.Bundle;
-        import android.os.Handler;
-        import android.os.Message;
-        import android.support.annotation.NonNull;
-        import android.text.TextUtils;
-        import android.text.method.ScrollingMovementMethod;
-        import android.util.Log;
-        import android.view.MenuItem;
-        import android.view.View;
-        import android.view.ViewGroup;
-        import android.widget.ArrayAdapter;
-        import android.widget.Button;
-        import android.widget.ImageButton;
-        import android.widget.LinearLayout;
-        import android.widget.PopupWindow;
-        import android.widget.TextView;
-        import android.widget.Toast;
+import android.Manifest;
+import android.accounts.AccountManager;
+import android.app.Activity;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.AnimationDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
+import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.TextView;
+import android.widget.Toast;
 
-        import org.rul.bluetoothserial.adapter.DeviceListAdapter;
-        import org.rul.bluetoothserial.bluetooth.Bluetooth;
-        import org.rul.bluetoothserial.bluetooth.BluetoothLE;
-        import org.rul.bluetoothserial.bluetooth.MeTimer;
-        import org.rul.meapi.common.MeConstants;
-        import org.rul.meapi.device.MeMatrixLedDevice;
-        import org.rul.meapi.model.CommandSimple;
+import org.mortbay.jetty.Main;
+import org.rul.bluetoothserial.adapter.DeviceListAdapter;
+import org.rul.bluetoothserial.bluetooth.Bluetooth;
+import org.rul.bluetoothserial.bluetooth.BluetoothLE;
+import org.rul.bluetoothserial.bluetooth.MeTimer;
+import org.rul.meapi.common.MeConstants;
+import org.rul.meapi.device.MeMatrixLedDevice;
+import org.rul.meapi.model.CommandSimple;
 
-        import java.io.IOException;
-        import java.io.OutputStream;
-        import java.nio.ByteBuffer;
-        import java.nio.ByteOrder;
-        import java.util.ArrayList;
-        import java.util.Arrays;
-        import java.util.List;
-        import java.util.Set;
-        import java.util.Timer;
-        import java.util.TimerTask;
-        import java.util.UUID;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
 
-        import pub.devrel.easypermissions.AfterPermissionGranted;
-        import pub.devrel.easypermissions.EasyPermissions;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends Activity
         implements EasyPermissions.PermissionCallbacks {
@@ -102,7 +109,8 @@ public class MainActivity extends Activity
             UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     // Insert your bluetooth devices MAC address
-    private static String address = "00:07:02:03:10:A3";
+    //private static String address = "00:07:02:03:10:A3";  //Address mbot
+    private static String address = "00:80:5A:46:22:50";  //address pen bluetooth
     private OutputStream outStream = null;
 
     ImageButton buttonForward;
@@ -137,6 +145,12 @@ public class MainActivity extends Activity
     Timer mTimer;
     TimerTask mTimerTask;
 
+    private Button btnRefresh;
+    ImageButton runBtn;
+
+    private int screenWidth,screenHeight;
+    FrameLayout contentView;
+
     /**
      * Create the main activity.
      * @param savedInstanceState previously saved instance data.
@@ -152,6 +166,13 @@ public class MainActivity extends Activity
         buttonLeft = (ImageButton) findViewById(R.id.buttonLeft);
         buttonRight = (ImageButton) findViewById(R.id.buttonRight);
         buttonBackward = (ImageButton) findViewById(R.id.buttonBackward);
+        contentView = (FrameLayout)findViewById(R.id.content);
+        contentView.getForeground().setAlpha(0);
+
+        WindowManager window = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        screenWidth = window.getDefaultDisplay().getWidth();
+        screenHeight = window.getDefaultDisplay().getHeight();
+
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("Calling Google Sheets API ...");
 
@@ -169,9 +190,52 @@ public class MainActivity extends Activity
             BluetoothLE.sharedManager().leHandler = mLeHandler;
             devAdapter = new DeviceListAdapter(this,BluetoothLE.sharedManager().getDeviceList(),R.layout.device_list_item);
             MeTimer.startWrite();
+            BluetoothLE.sharedManager().selectDevice(address);
+            System.out.println(BluetoothLE.sharedManager().isConnected());
         }
 
-        btAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        /*if(blt!=null){
+            if(blt.connDev==null){
+                showBtSelect();
+            }
+
+        }else{
+            if(BluetoothLE.sharedManager().isConnected()){
+
+                startTimer(200);
+            }else{
+                showBtSelect();
+            }
+        }*/
+        /*runBtn = (ImageButton)this.findViewById(R.id.runLayout);
+        runBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                if(engineState==STAGE_IDLE){
+                    if(blt!=null){
+                        if(blt.connDev==null){
+                            showBtSelect();
+                        }
+
+                    }else{
+                        if(BluetoothLE.sharedManager().isConnected()){
+
+                            startTimer(200);
+                        }else{
+                            showBtSelect();
+                        }
+                    }
+                }else{
+                    stopTimer();
+                    engineState = STAGE_IDLE;
+                    runBtn.setImageResource(R.drawable.run_button);
+                }
+               // MobclickAgent.onEvent(mContext, "runLayout");
+            }
+        });*/
+
+        /*btAdapter = BluetoothAdapter.getDefaultAdapter();
         Set<BluetoothDevice> devices = btAdapter.getBondedDevices();
         checkBTState();
         if (btAdapter.isEnabled()) {
@@ -182,7 +246,7 @@ public class MainActivity extends Activity
             createConnection();
             getResultsFromApi("1jCvYSZTdo5_FheTGDo9zD6t1Rqb3yBIs3cHayob29Ns", "A1:P8", "Erik");
 
-        }
+        }*/
 //        LinearLayout activityLayout = new LinearLayout(this);
 //        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
 //                LinearLayout.LayoutParams.MATCH_PARENT,
@@ -332,7 +396,7 @@ public class MainActivity extends Activity
 
         Log.d(TAG, "...In onPause()...");
 
-        if (outStream != null) {
+       /* if (outStream != null) {
             try {
                 outStream.flush();
             } catch (IOException e) {
@@ -344,7 +408,7 @@ public class MainActivity extends Activity
             btSocket.close();
         } catch (IOException e2) {
             errorExit("Fatal Error", "In onPause() and failed to close socket." + e2.getMessage() + ".");
-        }
+        }*/
     }
 
     /**
@@ -528,11 +592,13 @@ public class MainActivity extends Activity
             if (output == null || output.limit() == 0) {
                 mOutputText.setText("No results returned.");
             } else {
-//                mOutputText.setText(TextUtils.join("\n", output));
-                MeMatrixLedDevice meMatrixLedDevice = new MeMatrixLedDevice("Matrix", 1);
+                mOutputText.setText(output.toString());
+
+                //TODO: aqui podemos recuperar el resultado de las matriz de los excel
+              /*  MeMatrixLedDevice meMatrixLedDevice = new MeMatrixLedDevice("Matrix", 1);
                 CommandSimple commandSimple = meMatrixLedDevice.pintarFace(output, 0, 0);
 
-                sendData(commandSimple);
+                sendData(commandSimple);*/
             }
         }
 
@@ -558,7 +624,7 @@ public class MainActivity extends Activity
         }
     }
 
-    private void createConnection(){
+/*    private void createConnection(){
         Log.d(TAG, "...In onResume - Attempting client connect...");
         tvLogsBluetooth.append("\n...In onResume - Attempting client connect...");
         // Set up a pointer to the remote node using it's address.
@@ -620,8 +686,8 @@ public class MainActivity extends Activity
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             }
         }
-    }
-
+    }*/
+/*
     private void errorExit(String title, String message) {
         Toast msg = Toast.makeText(getBaseContext(),
                 title + " - " + message, Toast.LENGTH_SHORT);
@@ -645,7 +711,7 @@ public class MainActivity extends Activity
 
             errorExit("Fatal Error", msg);
         }
-    }
+    }*/
 
     // --------------- BULETOOTH BELOW ---------------------
     final Handler mHandler = new Handler(){
@@ -741,10 +807,10 @@ public class MainActivity extends Activity
                 }
                 break;
                 case BluetoothLE.MSG_SCAN_END:{
-                    if(btnRefresh!=null){
+                    /*if(btnRefresh!=null){
                         AnimationDrawable d=(AnimationDrawable)btnRefresh.getCompoundDrawables()[0];
                         d.stop();
-                    }
+                    }*/
                 }
                 break;
                 case BluetoothLE.MSG_RX:
@@ -883,8 +949,8 @@ public class MainActivity extends Activity
 
     void parseMsg(int[] msg){
 
-//			Log.d("mb", "parseMSG:"+msg.length);
-        if(engineState==STAGE_PROBING){
+			Log.d("mb", "parseMSG:"+msg.length);
+        /*if(engineState==STAGE_PROBING){
             engineState = STAGE_DONWLOAD_PROCESS;
             stopTimer();
             int ret = firmup.parseCmd(msg);
@@ -915,8 +981,10 @@ public class MainActivity extends Activity
                     uploadPb.dismiss();
                 }
             }
-        }else if(msg.length>2){
-            if((msg[2]&0xff)==MeModule.VERSION_INDEX){
+        }else */
+        if(engineState != STAGE_DONWLOAD_PROCESS &&
+                engineState != STAGE_PROBING && msg.length>2){
+            if((msg[2]&0xff)==MeConstants.VERSION_INDEX){
                 int len = msg[4];
                 String hexStr="";
                 for(int i=0;i<len;i++){
@@ -941,7 +1009,7 @@ public class MainActivity extends Activity
                 }else if(msg[3]==3){
                     f = (msg[4]&0xff)+((msg[5]&0xff)<<8);
                 }
-                if(moduleIndex<0 || moduleIndex>layout.moduleList.size()){
+                /*if(moduleIndex<0 || moduleIndex>layout.moduleList.size()){
                     return;
                 }
                 //rx:FF 55 04 04 07 31 2E 31 2E 31 30 32 0D 0A
@@ -949,11 +1017,128 @@ public class MainActivity extends Activity
                 if(moduleIndex<layout.moduleList.size()){
                     MeModule mod = layout.moduleList.get(moduleIndex);
                     mod.setEchoValue(""+f);
-                }
+                }*/
 
             }
         }else if(msg.length<3){
             return;
         }
+    }
+
+    void showBtSelect(){
+        if(blt==null){
+            BluetoothLE.sharedManager().start();
+        }
+        new Handler().postDelayed(new Runnable(){
+
+            public void run() {
+                LinearLayout popupBtDevLayout;
+                popupBtDevLayout = (LinearLayout) LayoutInflater.from(MainActivity.this).inflate(
+                        R.layout.popup_btselect, null);
+                popupBtSelect = new PopupWindow(MainActivity.this);
+                popupBtSelect.setWidth(screenWidth/2);
+                popupBtSelect.setHeight((int) (screenHeight*0.8));
+                popupBtSelect.setOutsideTouchable(true);
+                popupBtSelect.setFocusable(true);
+                popupBtSelect.setContentView(popupBtDevLayout);
+                popupBtSelect.showAtLocation(contentView, Gravity.LEFT|Gravity.TOP, screenWidth/4, screenHeight/10+25);
+                ListView devlist = (ListView) popupBtDevLayout.findViewById(R.id.btdevList);
+                //ListView pairlist = (ListView) popupBtDevLayout.findViewById(R.id.btpairList);
+                devlist.setAdapter(devAdapter);
+                //pairlist.setAdapter(pairAdapter);
+
+                popupBtSelect.setOnDismissListener(new PopupWindow.OnDismissListener(){
+                    @Override
+                    public void onDismiss() {
+                        contentView.getForeground().setAlpha(0);
+                    }
+                });
+
+                devlist.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        try{ // the bluetooth list may vary
+                            if(blt!=null){
+                                BluetoothDevice dev = blt.btDevices.get(position);
+                                if(blt.connDev!=null && blt.connDev.equals(dev)){
+                                    // disconnect device
+                                    blt.bluetoothDisconnect(blt.connDev);
+                                    return;
+                                }
+                                blt.bluetoothConnect(dev);
+                            }else{
+                                if(BluetoothLE.sharedManager().isConnected()){
+                                    BluetoothLE.sharedManager().close();
+                                    devLEListChanged();
+                                }else{
+ //                                   BluetoothLE.sharedManager().selectDevice(position);
+                                }
+                            }
+                        }catch(Exception e){
+                            Log.e(dbg, e.toString());
+                        }
+                    }
+                });
+                contentView.getForeground().setAlpha(150);
+                btnRefresh = (Button) popupBtDevLayout.findViewById(R.id.popupRefreshBtn);
+                btnRefresh.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v) {
+                        if(blt!=null){
+                            if(!blt.isDiscovery()){
+                                blt.devListClear();
+                                devListChanged();
+                                Log.i(dbg,"startDiscovery");
+                                blt.startDiscovery();
+                            }
+                        }else{
+                            BluetoothLE.sharedManager().stop();
+                            BluetoothLE.sharedManager().clear();
+                            devLEListChanged();
+                            BluetoothLE.sharedManager().start();
+                        }
+                        AnimationDrawable d=(AnimationDrawable)btnRefresh.getCompoundDrawables()[0];
+                        d.start();
+                    }
+                });
+
+                Button btnOk = (Button)popupBtDevLayout.findViewById(R.id.popupOkBtn);
+                btnOk.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v) {
+                        popupBtSelect.dismiss();
+                        if(blt!=null){
+                            if(blt.connDev!=null){
+                                engineState = STAGE_RUN;
+                      /*  if(firmVersion==0){
+                            stopTimer(); // stop previous version probing timer
+                            Log.d("firmversion", "UNKNOW");
+                            showUpgradeDialog();
+                        }
+                        stopTimer();
+                        startTimer(200);
+                        enableAllModule();
+                        runBtn.setImageResource(R.drawable.pause_button);*/
+                            }
+                        }else{
+                            if(BluetoothLE.sharedManager().isConnected()){
+                                engineState = STAGE_RUN;
+                        /*if(firmVersion==0){
+                            stopTimer(); // stop previous version probing timer
+                            Log.d("firmversion", "UNKNOW");
+                            showUpgradeDialog();
+                        }
+                        stopTimer();
+                        startTimer(200);
+                        enableAllModule();*/
+                                runBtn.setImageResource(R.drawable.pause_button);
+                            }
+                        }
+                    }
+                });
+            }
+
+        }, 100L);
+
     }
 }

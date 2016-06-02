@@ -47,10 +47,10 @@ public class Bluetooth extends Service{
     BluetoothAdapter mBTAdapter;
     static final String BTName = "BTMakeblock";
     static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");//UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
-    BluetoothDevice connDev;
+    public BluetoothDevice connDev;
     ConnectThread mConnectThread;
     ConnectedThread mConnectedThread;
-    ArrayList<BluetoothDevice> btDevices;
+    public ArrayList<BluetoothDevice> btDevices;
     ArrayList<BluetoothDevice> prDevices; // paired bt devices
     //public ArrayAdapter<String> devAdapter;
     public Handler mHandler;

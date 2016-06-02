@@ -5,4 +5,8 @@
     <string name="unbond">unbond</string>
     <string name="bonded">bonded</string>
     <string name="connecting">connecting</string>
+    <string name="connectfail">Error de conexión</string>
+    <string name="refresh">Refresh</string>
+    <string name="selectdevice">Seleccionar dispositivo</string>
+    <string name="ok">Ok</string>
 </resources>

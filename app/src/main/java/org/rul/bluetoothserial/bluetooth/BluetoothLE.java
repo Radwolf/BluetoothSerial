@@ -26,6 +26,7 @@ import org.rul.bluetoothserial.adapter.LeDeviceListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @SuppressLint("NewApi")
 public class BluetoothLE extends Service {
@@ -134,8 +135,14 @@ public class BluetoothLE extends Service {
         }
         return data;
     }
-    public boolean selectDevice(int position) {
-        final BluetoothDevice device = mDevices.getDevice(position);
+    public boolean selectDevice(String address) {
+        Set<BluetoothDevice> bluetoothDeviceSet = mBluetoothAdapter.getBondedDevices();
+        BluetoothDevice device = null;
+        for(BluetoothDevice bluetoothDevice: bluetoothDeviceSet){
+            if(bluetoothDevice.getAddress().equals(address)){
+                device = bluetoothDevice;
+            }
+        }
         if (device == null) return false;
         if (mScanning) {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
@@ -145,7 +152,7 @@ public class BluetoothLE extends Service {
             Message msg = leHandler.obtainMessage(MSG_CONNECTING);
             leHandler.sendMessage(msg);
         }
-        boolean conn = mBLE.connect(device.getAddress());
+        boolean conn = mBLE.connect(address);
         if(conn){
             mCurrentDevice = device;
         }

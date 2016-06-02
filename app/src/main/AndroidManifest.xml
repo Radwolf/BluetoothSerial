@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false"/>
 
     <application
         android:allowBackup="true"
@@ -23,6 +24,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".DialogActivity"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@android:style/Theme.Holo.Dialog"
+            android:label="@string/app_name"
+            ></activity>
+        <service
+            android:name=".bluetooth.Bluetooth"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="org.rul.bluetoothserial" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".bluetooth.BluetoothLE"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="cc.makeblock.makeblock" />
+            </intent-filter>
+        </service>
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
