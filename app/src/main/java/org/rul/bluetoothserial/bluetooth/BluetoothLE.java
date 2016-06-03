@@ -55,7 +55,7 @@ public class BluetoothLE extends Service {
     public static final int MSG_SCAN_END = 9;
     public static final int MSG_CONNECTING = 10;
     // Stops scanning after 10 seconds.
-    private static final long SCAN_PERIOD = 10000;
+    private static final long SCAN_PERIOD = 100000;
 
     static final int MODE_LINE = 0;
     static final int MODE_FORWARD = 1;
@@ -115,6 +115,12 @@ public class BluetoothLE extends Service {
 
         List<String> data = new ArrayList<String>();
 //      prDevices.clear();
+        if(mDevices.getCount()==0){
+            Set<BluetoothDevice> pariedDevices = mBluetoothAdapter.getBondedDevices();
+            for(BluetoothDevice pariedDevice: pariedDevices){
+                mDevices.addDevice(pariedDevice);
+            }
+        }
         for(int i=0;i<mDevices.getCount();i++){
             BluetoothDevice dev = mDevices.getDevice(i);
             String s = dev.getName();
@@ -135,14 +141,8 @@ public class BluetoothLE extends Service {
         }
         return data;
     }
-    public boolean selectDevice(String address) {
-        Set<BluetoothDevice> bluetoothDeviceSet = mBluetoothAdapter.getBondedDevices();
-        BluetoothDevice device = null;
-        for(BluetoothDevice bluetoothDevice: bluetoothDeviceSet){
-            if(bluetoothDevice.getAddress().equals(address)){
-                device = bluetoothDevice;
-            }
-        }
+    public boolean selectDevice(int position) {
+        final BluetoothDevice device = mDevices.getDevice(position);
         if (device == null) return false;
         if (mScanning) {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
@@ -152,7 +152,7 @@ public class BluetoothLE extends Service {
             Message msg = leHandler.obtainMessage(MSG_CONNECTING);
             leHandler.sendMessage(msg);
         }
-        boolean conn = mBLE.connect(address);
+        boolean conn = mBLE.connect(device.getAddress());
         if(conn){
             mCurrentDevice = device;
         }

@@ -13,46 +13,30 @@
     android:orientation="vertical"
     tools:showIn="@layout/activity_main">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:orientation="horizontal">
+
+                <ListView
+                    android:id="@+id/list_v"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="4"></ListView>
+                <Button
+                    android:id="@+id/buttonRefresh"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"/>
+        </LinearLayout>
         <TextView
             android:id="@+id/out"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="2"
             android:scrollIndicators="right" />
-        <FrameLayout
-            android:id="@+id/content"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#FFFFFFFF"
-            android:foreground="@drawable/shape_window_dim"
-            android:orientation="vertical" >
 
-                <FrameLayout
-                    android:layout_width="1dp"
-                    android:layout_height="fill_parent"
-                    android:background="#ff000000" >
-
-                </FrameLayout>
-
-                <ImageButton
-                    android:id="@+id/drawModule"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:layout_gravity="bottom|left"
-                    android:background="#00000000"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/add_button" />
-
-                <ImageButton
-                    android:id="@+id/runLayout"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:layout_gravity="bottom|right"
-                    android:background="#00000000"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/run_button" />
-
-        </FrameLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"

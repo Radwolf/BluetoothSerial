@@ -110,8 +110,8 @@ public class MainActivity extends Activity
             UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     // Insert your bluetooth devices MAC address
-    private static String address = "00:07:02:03:10:A3";  //Address mbot
-//    private static String address = "00:80:5A:46:22:50";  //address pen bluetooth
+//    private static String address = "00:07:02:03:10:A3";  //Address mbot
+    private static String address = "00:80:5A:46:22:50";  //address pen bluetooth
     private OutputStream outStream = null;
 
     ImageButton buttonForward;
@@ -151,6 +151,7 @@ public class MainActivity extends Activity
 
     private int screenWidth,screenHeight;
     FrameLayout contentView;
+    UpgradeFirm firmup;
 
     /**
      * Create the main activity.
@@ -167,12 +168,14 @@ public class MainActivity extends Activity
         buttonLeft = (ImageButton) findViewById(R.id.buttonLeft);
         buttonRight = (ImageButton) findViewById(R.id.buttonRight);
         buttonBackward = (ImageButton) findViewById(R.id.buttonBackward);
-        contentView = (FrameLayout)findViewById(R.id.content);
+        //contentView = (FrameLayout)findViewById(R.id.content);
         contentView.getForeground().setAlpha(0);
 
         WindowManager window = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         screenWidth = window.getDefaultDisplay().getWidth();
         screenHeight = window.getDefaultDisplay().getHeight();
+
+        firmup = new UpgradeFirm(this);
 
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("Calling Google Sheets API ...");
@@ -191,7 +194,7 @@ public class MainActivity extends Activity
             BluetoothLE.sharedManager().leHandler = mLeHandler;
             devAdapter = new DeviceListAdapter(this,BluetoothLE.sharedManager().getDeviceList(),R.layout.device_list_item);
             MeTimer.startWrite();
-            BluetoothLE.sharedManager().selectDevice(address);
+            //BluetoothLE.sharedManager().selectDevice(address);
             System.out.println(BluetoothLE.sharedManager().isConnected());
 
             MeMotorDevice meMotorDeviceI = new MeMotorDevice("Prueba giro inverso", MeConstants.PORT_M1, 1);
@@ -869,7 +872,7 @@ public class MainActivity extends Activity
             mTimerTask = new TimerTask(){
                 @Override
                 public void run() {
-                    /*if(engineState==STAGE_PROBING){
+                    if(engineState==STAGE_PROBING){
                         byte[] queryStr = firmup.getProbeCmd();
                         if(queryStr!=null){
                             if(blt!=null){
@@ -878,8 +881,7 @@ public class MainActivity extends Activity
                                 BluetoothLE.sharedManager().resetIO(queryStr);
                             }
                         }
-                    }else */
-                    if(engineState==STAGE_RUN){
+                    }else if(engineState==STAGE_RUN){
                         byte[] queryStr = getQueryString();
                         if(queryStr!=null){
                             if(blt!=null){

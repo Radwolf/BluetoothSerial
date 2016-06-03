@@ -98,21 +98,6 @@ public class ConnectTest extends Activity {
 //            tvLogsBluetooth.append(String.format("\n%s", motorD.readCommand(commandBytes)));
         }
 
-//        buttonForward.setOnClickListener(new View.OnClickListener() {
-//
-//            public void onClick(View button) {
-//                //Set the button's appearance
-//                button.setSelected(!button.isSelected());
-//
-//                if (button.isSelected()) {
-//                    tvLogsBluetooth.append("\nPulso el botón avanzar");
-//                } else {
-//                    tvLogsBluetooth.append("\nSuelto el botón avanzar");
-//                }
-//
-//            }
-//
-//        });
 
  /*       final MeMotorAPI motorAPI = new MeMotorAPI(MeModuleCommunication.PORT_M1, MeModuleCommunication.PORT_M2, 100, -100);
         buttonForward.setOnTouchListener(new View.OnTouchListener() {
