@@ -13,6 +13,7 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,6 +27,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -37,6 +39,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -135,6 +138,13 @@ public class BluetoothLESimpleActivity extends Activity {
     FrameLayout contentView;
     UpgradeFirm firmup;
 
+    private Intent serviceIntent = new Intent("org.rul.bluetoothserial");
+    private boolean isexit = false;
+    private boolean hastask = false;
+    private boolean ispause = false;
+    private TimerTask task;
+    private Timer texit = new Timer();
+
     /**
      * Create the main activity.
      * @param savedInstanceState previously saved instance data.
@@ -146,6 +156,16 @@ public class BluetoothLESimpleActivity extends Activity {
 
         setContentView(R.layout.activity_main);
         tvLogsBluetooth = (TextView) findViewById(R.id.out);
+
+        serviceIntent.setPackage(BluetoothLESimpleActivity.class.getPackage().getName());
+
+        startService(serviceIntent);
+        task = new TimerTask() {
+            public void run() {
+                isexit = false;
+                hastask = true;
+            }
+        };
 
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             BluetoothLE.sharedManager().setup(this);
@@ -267,7 +287,7 @@ public class BluetoothLESimpleActivity extends Activity {
                 }
                 break;
                 case BluetoothLE.MSG_CONNECTING:{
-                    Intent intent =new Intent(BluetoothLESimpleActivity.this,DialogActivity.class);
+                    Intent intent =new Intent(BluetoothLESimpleActivity.this, DialogActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra("msg", getString(R.string.connecting));
                     startActivity(intent);
@@ -340,23 +360,15 @@ public class BluetoothLESimpleActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 try{ // the bluetooth list may vary
-                    if(blt!=null){
-                        BluetoothDevice dev = blt.btDevices.get(position);
-                        if(blt.connDev!=null && blt.connDev.equals(dev)){
-                            // disconnect device
-                            blt.bluetoothDisconnect(blt.connDev);
-                            return;
-                        }
-                        blt.bluetoothConnect(dev);
+
+                    if(BluetoothLE.sharedManager().isConnected()){
+                        BluetoothLE.sharedManager().close();
+                        devLEListChanged();
                     }else{
-                        if(BluetoothLE.sharedManager().isConnected()){
-                            BluetoothLE.sharedManager().close();
-                            devLEListChanged();
-                        }else{
-                            BluetoothLE.sharedManager().selectDevice(position);
-                            BluetoothLE.sharedManager().isConnected();
-                        }
+                        boolean seleccionado = BluetoothLE.sharedManager().selectDevice(position);
+                        Log.d(dbg, String.valueOf(seleccionado));
                     }
+
                 }catch(Exception e){
                     Log.e(dbg, e.toString());
                 }
@@ -372,41 +384,27 @@ public class BluetoothLESimpleActivity extends Activity {
                 BluetoothLE.sharedManager().start();
             }
         });
-/*
-        Button btnOk = (Button)popupBtDevLayout.findViewById(R.id.popupOkBtn);
-        btnOk.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                popupBtSelect.dismiss();
-                if(blt!=null){
-                    if(blt.connDev!=null){
-                        engineState = STAGE_RUN;
-              *//*  if(firmVersion==0){
-                    stopTimer(); // stop previous version probing timer
-                    Log.d("firmversion", "UNKNOW");
-                    showUpgradeDialog();
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK
+                && event.getAction() == KeyEvent.ACTION_DOWN
+                && event.getRepeatCount() == 0) {
+            if(isexit == false){
+                isexit = true;
+                Toast.makeText(getApplicationContext(), getString(R.string.pressbackagain), Toast.LENGTH_SHORT).show();
+                if(!hastask) {
+                    texit.schedule(task, 2000);
                 }
-                stopTimer();
-                startTimer(200);
-                enableAllModule();
-                runBtn.setImageResource(R.drawable.pause_button);*//*
-                    }
-                }else{
-                    if(BluetoothLE.sharedManager().isConnected()){
-                        engineState = STAGE_RUN;
-                *//*if(firmVersion==0){
-                    stopTimer(); // stop previous version probing timer
-                    Log.d("firmversion", "UNKNOW");
-                    showUpgradeDialog();
-                }
-                stopTimer();
-                startTimer(200);
-                enableAllModule();*//*
-                        runBtn.setImageResource(R.drawable.pause_button);
-                    }
-                }
+            }else{
+                //BluetoothAdapter.getDefaultAdapter().disable();
+                stopService(serviceIntent);
+                finish();
+                System.exit(0);
             }
-        });
-*/
+            return false;
+        }
+        return super.dispatchKeyEvent(event);
     }
 }

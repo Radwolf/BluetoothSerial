@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="false"/>
 
@@ -31,17 +32,17 @@
             android:label="@string/app_name"
             ></activity>
         <service
-            android:name=".bluetooth.Bluetooth"
+            android:name="org.rul.bluetoothserial.bluetooth.Bluetooth"
             android:enabled="true" >
             <intent-filter>
                 <action android:name="org.rul.bluetoothserial" />
             </intent-filter>
         </service>
         <service
-            android:name=".bluetooth.BluetoothLE"
+            android:name="org.rul.bluetoothserial.bluetooth.BluetoothLE"
             android:enabled="true" >
             <intent-filter>
-                <action android:name="cc.makeblock.makeblock" />
+                <action android:name="org.rul.bluetoothserial" />
             </intent-filter>
         </service>
         <meta-data

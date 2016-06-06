@@ -45,6 +45,7 @@ import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -153,6 +154,13 @@ public class MainActivity extends Activity
     FrameLayout contentView;
     UpgradeFirm firmup;
 
+    private Intent serviceIntent = new Intent("org.rul.bluetoothserial");
+    private boolean isexit = false;
+    private boolean hastask = false;
+    private boolean ispause = false;
+    private TimerTask task;
+    private Timer texit = new Timer();
+
     /**
      * Create the main activity.
      * @param savedInstanceState previously saved instance data.
@@ -168,8 +176,17 @@ public class MainActivity extends Activity
         buttonLeft = (ImageButton) findViewById(R.id.buttonLeft);
         buttonRight = (ImageButton) findViewById(R.id.buttonRight);
         buttonBackward = (ImageButton) findViewById(R.id.buttonBackward);
+
+        startService(serviceIntent);
+        task = new TimerTask() {
+            public void run() {
+                isexit = false;
+                hastask = true;
+            }
+        };
+
         //contentView = (FrameLayout)findViewById(R.id.content);
-        contentView.getForeground().setAlpha(0);
+        //contentView.getForeground().setAlpha(0);
 
         WindowManager window = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         screenWidth = window.getDefaultDisplay().getWidth();
@@ -1151,4 +1168,26 @@ public class MainActivity extends Activity
         }, 100L);
 
     }*/
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK
+                && event.getAction() == KeyEvent.ACTION_DOWN
+                && event.getRepeatCount() == 0) {
+            if(isexit == false){
+                isexit = true;
+                Toast.makeText(getApplicationContext(), getString(R.string.pressbackagain), Toast.LENGTH_SHORT).show();
+                if(!hastask) {
+                    texit.schedule(task, 2000);
+                }
+            }else{
+                BluetoothAdapter.getDefaultAdapter().disable();
+                stopService(serviceIntent);
+                finish();
+                System.exit(0);
+            }
+            return false;
+        }
+        return super.dispatchKeyEvent(event);
+    }
 }
