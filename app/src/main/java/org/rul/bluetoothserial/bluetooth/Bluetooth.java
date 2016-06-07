@@ -380,7 +380,7 @@ public class Bluetooth extends Service{
                 s = "Bluetooth";
             }
             //String[] a = dev.getAddress().split(":");
-            s=s+" "+dev.getAddress()+" "+(dev.getBondState()==BluetoothDevice.BOND_BONDED?((connDev!=null && connDev.equals(dev))?getString(R.string.connected):getString(R.string.bonded)):getString(R.string.unbond));
+            s=s+" "+dev.getAddress()+" "+(dev.getBondState()==BluetoothDevice.BOND_BONDED?((connDev!=null && connDev.equals(dev))?"Conectado":"Emparejado"):"Desemparejado");
 
             data.add(s);
         }
@@ -443,10 +443,10 @@ public class Bluetooth extends Service{
 //		   startActivity(intent);
 //		}
 
-        Intent intent =new Intent(this,DialogActivity.class);
+      /*  Intent intent =new Intent(this,DialogActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("msg", getString(R.string.connecting));
-        startActivity(intent);
+        startActivity(intent);*/
 
     }
 
@@ -460,10 +460,10 @@ public class Bluetooth extends Service{
         if(mConnectedThread != null){mConnectedThread.cancel();mConnectedThread = null;}
         mConnectedThread = new ConnectedThread(socket);
         mConnectedThread.start();
-        Intent intent =new Intent(this,DialogActivity.class);
+        /*Intent intent =new Intent(getApplicationContext(), DialogActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("msg", "connected");
-        startActivity(intent);
+        startActivity(intent);*/
     }
 
     @Override
