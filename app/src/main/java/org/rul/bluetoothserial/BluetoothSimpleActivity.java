@@ -41,6 +41,7 @@ import org.rul.bluetoothserial.bluetooth.BluetoothLE;
 import org.rul.bluetoothserial.bluetooth.MeTimer;
 import org.rul.meapi.common.MeConstants;
 import org.rul.meapi.device.MeMotorDevice;
+import org.rul.meapi.device.MeUltrasonicDevice;
 import org.rul.meapi.model.CommandSimple;
 
 import java.io.OutputStream;
@@ -131,6 +132,7 @@ public class BluetoothSimpleActivity extends Activity {
         }
 
         final MeMotorDevice motorDevice = new MeMotorDevice("Motor1", MeConstants.PORT_M1, 1);
+        final MeUltrasonicDevice ultrasonicDevice = new MeUltrasonicDevice("USonic", MeConstants.PORT_3, 1);
         buttonForward.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
@@ -140,11 +142,17 @@ public class BluetoothSimpleActivity extends Activity {
                         ImageButton view = (ImageButton ) v;
                         view.getBackground().setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
                         v.invalidate();
-                        CommandSimple commandGiroDirecto = motorDevice.giroDirecto(100);
-                        //blt.bluetoothWrite(commandGiroDirecto.getCadena());
-                        String cadena = "Prueba\n\r";
-                        blt.bluetoothWrite(cadena.getBytes());
-                        //tvLogsBluetooth.append(String.format("\n%s", commandGiroDirecto.toString()));
+
+//                        CommandSimple commandGiroDirecto = motorDevice.giroDirecto(100);
+//                        blt.bluetoothWrite(commandGiroDirecto.getCadena());
+//                        tvLogsBluetooth.append(String.format("\n%s", commandGiroDirecto.toString()));
+
+                        //String cadena = "Prueba\n\r";
+                        //blt.bluetoothWrite(cadena.getBytes());
+
+                        CommandSimple commandUSGetDistancia = ultrasonicDevice.getDistancia();
+                        blt.bluetoothWrite(commandUSGetDistancia.getCadena());
+                        tvLogsBluetooth.append(String.format("\n%s", commandUSGetDistancia.toString()));
                         tvLogsBluetooth.append("\nPulso el botón avanzar");
                         break;
                     }
@@ -225,7 +233,7 @@ public class BluetoothSimpleActivity extends Activity {
                 break;
                 case Bluetooth.MSG_RX:
                     int[] rx = (int[]) msg.obj;
-                    Log.d(dbg, rx.toString());
+                    parseMsg(rx);
                     break;
                 case Bluetooth.MSG_FOUNDDEVICE:
                     devListChanged();
@@ -328,6 +336,44 @@ public class BluetoothSimpleActivity extends Activity {
                 }
             }
         });
+    }
+
+    void parseMsg(int[] msg) {
+
+//			Log.d("mb", "parseMSG:"+msg.length);
+        if (msg.length > 2) {
+            if ((msg[2] & 0xff) == MeConstants.VERSION_INDEX) {
+                int len = msg[4];
+                String hexStr = "";
+                for (int i = 0; i < len; i++) {
+                    hexStr += String.format("%c", msg[5 + i]);
+                }
+                Log.d("mb", "version:" + hexStr);
+                if (engineState == STAGE_IDLE) {
+                    stopTimer();
+                }
+            } else {
+                int moduleIndex = msg[2];
+                if (msg.length < 7) return;
+                float f = 0.0f;
+                if (msg[3] == 2) {
+                    if (msg.length > 7) {
+                        int tint = (msg[4] & 0xff) + ((msg[5] & 0xff) << 8) + ((msg[6] & 0xff) << 16) + ((msg[7] & 0xff) << 24);
+                        f = Float.intBitsToFloat(tint);
+                    }
+                } else if (msg[3] == 1) {
+                    f = (msg[4] & 0xff);
+                } else if (msg[3] == 3) {
+                    f = (msg[4] & 0xff) + ((msg[5] & 0xff) << 8);
+                }
+                //rx:FF 55 04 04 07 31 2E 31 2E 31 30 32 0D 0A
+
+                tvLogsBluetooth.append("\nLa respuesta: " + f);
+
+            }
+        } else if (msg.length < 3) {
+            return;
+        }
     }
 
     @Override

@@ -123,5 +123,14 @@ public class Utils {
         }
         return stringBuilder.toString();
     }
+
+    public static int convert4ByteToInt(byte[] dataResponded){
+        int dataInt = 0;
+        dataInt += (dataResponded[4] << 24);
+        dataInt += (dataResponded[5] << 16);
+        dataInt += (dataResponded[6] << 8);
+        dataInt += dataResponded[7];
+        return dataInt;
+    }
 }
 

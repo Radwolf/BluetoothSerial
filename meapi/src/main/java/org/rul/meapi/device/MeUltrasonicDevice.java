@@ -35,20 +35,11 @@ public class MeUltrasonicDevice extends MeDevice {
 
     //Realizamos una peticion de lectura para el sensor de ultrasonido
     public CommandSimple getDistancia(){
-        CommandSimple command = new CommandSimple("Lectura sensor ultrasonico", index, LENGTH_INSTRUCTION_ULTRASONIC, MeConstants.WRITEMODULE);
+        CommandSimple command = new CommandSimple("Lectura sensor ultrasonico", index, LENGTH_INSTRUCTION_ULTRASONIC, MeConstants.READMODULE);
         initCommand(command);
         command.setElementCadena(COMMAND_PARAMETER_INDEX, org.rul.meapi.common.Utils.intToByte(command.getIndex()));
         command.setElementCadena(COMMAND_PARAMETER_PORT, org.rul.meapi.common.Utils.intToByte(port));
         return command;
-    }
-
-    public int convert4ByteToInt(byte [] dataResponded){
-        int dataInt = 0;
-        dataInt += (dataResponded[0] << 24);
-        dataInt += (dataResponded[1] << 16);
-        dataInt += (dataResponded[2] << 8);
-        dataInt += dataResponded[3];
-        return dataInt;
     }
 
 }
