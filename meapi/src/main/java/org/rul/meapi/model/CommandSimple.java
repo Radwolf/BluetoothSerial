@@ -75,6 +75,10 @@ public class CommandSimple extends CommandAbstract{
      */
     public int checkByteCadena(ByteBuffer byteBufferCheck){
         int position;
+        System.out.printf("Comprobación cadena del comando %s%n", this.getName());
+        System.out.println(String.format("Cadena a comparar: %s", Utils.bytesToHexString(byteBufferCheck.array())));
+        System.out.println(String.format("Cadena original: %s", Utils.bytesToHexString(byteCadena.array())));
+        System.out.println();
         if(byteBufferCheck.limit() == byteCadena.limit()) {
             for (position = 0; position < byteBufferCheck.limit()
                     && byteCadena.get(position) == byteBufferCheck.get(position); position++) {
