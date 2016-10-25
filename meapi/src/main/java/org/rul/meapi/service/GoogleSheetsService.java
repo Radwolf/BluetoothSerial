@@ -15,6 +15,9 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
+import org.rul.meapi.common.Utils;
+
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,6 +29,11 @@ import java.util.List;
 /**
  * Created by rgonzalez on 24/05/2016.
  */
+/**
+ * Para poder utilizar la api de drive desde android debemos pasarle este inputstream
+ * InputStream in = GoogleSheetsService.class.getResourceAsStream("/client_secret_api.json");
+ */
+
 public class GoogleSheetsService {
     /** Application name. */
     private static final String APPLICATION_NAME =
@@ -68,10 +76,9 @@ public class GoogleSheetsService {
      * @return an authorized Credential object.
      * @throws IOException
      */
-    public static Credential authorize() throws IOException {
+    public static Credential authorize(InputStream in) throws IOException {
         // Load client secrets.
-        InputStream in =
-                GoogleSheetsService.class.getResourceAsStream("/client_secret_api.json");
+
         GoogleClientSecrets clientSecrets =
                 GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
@@ -94,18 +101,18 @@ public class GoogleSheetsService {
      * @return an authorized Sheets API client service
      * @throws IOException
      */
-    private static Sheets getSheetsService() throws IOException {
-        Credential credential = authorize();
+    private static Sheets getSheetsService(InputStream in) throws IOException {
+        Credential credential = authorize(in);
         return new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
                 .setApplicationName(APPLICATION_NAME)
                 .build();
     }
 
-    public static ByteBuffer getFaceSheets(String face){
+    public static ByteBuffer getFaceSheets(InputStream in, String face){
         Sheets service = null;
         ByteBuffer cadenaFace = ByteBuffer.allocate(16).order(ByteOrder.LITTLE_ENDIAN);
         try {
-            service = getSheetsService();
+            service = getSheetsService(in);
             // Prints the names and majors of students in a sample spreadsheet:
             // https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
             String spreadsheetId = "1jCvYSZTdo5_FheTGDo9zD6t1Rqb3yBIs3cHayob29Ns";
@@ -124,7 +131,7 @@ public class GoogleSheetsService {
                         if("1".equals(row.get(i))) {
                             int valorCelda = cadenaFace.get(i);
                             valorCelda += valorFila;
-                            cadenaFace.put(i, (byte) valorCelda);
+                            cadenaFace.put(i, Utils.intToByte(valorCelda));
                         }
                     }
                     //System.out.println(Utils.bytesToHexString(cadenaFace.array()));

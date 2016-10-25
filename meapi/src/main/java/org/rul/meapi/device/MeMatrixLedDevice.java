@@ -33,21 +33,21 @@ public class MeMatrixLedDevice extends MeDevice {
 
     protected void initCommand(CommandSimple command){
         super.initCommand(command);
-        command.setElementCadena(COMMAND_PARAMETER_LENGTH, org.rul.meapi.common.Utils.intToByte(LENGTH_INSTRUCTION_MATRIX_LED));
-        command.setElementCadena(COMMAND_PARAMETER_DEVICE, (byte) MeConstants.DEV_MATRIX_LED);
-        command.setElementCadena(COMMAND_PARAMETER_ACTION, org.rul.meapi.common.Utils.intToByte(command.getType()));
+        command.setElementCadena(COMMAND_PARAMETER_LENGTH, Utils.intToByte(LENGTH_INSTRUCTION_MATRIX_LED));
+        command.setElementCadena(COMMAND_PARAMETER_DEVICE, Utils.intToByte(MeConstants.DEV_MATRIX_LED));
+        command.setElementCadena(COMMAND_PARAMETER_ACTION, Utils.intToByte(command.getType()));
     }
 
     //Pinta una face creada previamente en una hoja de un documento google sheets
     public CommandSimple pintarFace(ByteBuffer cadenaFace, int x, int y){
         //TODO: Debugar el commando matrix led para confirmar el lenght de la cadena, y el parametro length y desconocidos
-        CommandSimple command = new CommandSimple(String.format("Matrix led face"), index, LENGTH_INSTRUCTION_MATRIX_LED, org.rul.meapi.common.MeConstants.WRITEMODULE);
+        CommandSimple command = new CommandSimple(String.format("Matrix led face"), index, LENGTH_INSTRUCTION_MATRIX_LED, MeConstants.WRITEMODULE);
         initCommand(command);
-        command.setElementCadena(COMMAND_PARAMETER_INDEX, org.rul.meapi.common.Utils.intToByte(command.getIndex()));
-        command.setElementCadena(COMMAND_PARAMETER_PORT, org.rul.meapi.common.Utils.intToByte(MeConstants.PORT_1));
-        command.setElementCadena(COMMAND_PARAMETER_DESCONOCIDO_2, org.rul.meapi.common.Utils.intToByte(2));
-        command.setElementCadena(COMMAND_PARAMETER_POSITION_X, org.rul.meapi.common.Utils.intToByte(x));
-        command.setElementCadena(COMMAND_PARAMETER_POSITION_Y, org.rul.meapi.common.Utils.intToByte(y));
+        command.setElementCadena(COMMAND_PARAMETER_INDEX, Utils.intToByte(command.getIndex()));
+        command.setElementCadena(COMMAND_PARAMETER_PORT, Utils.intToByte(MeConstants.PORT_1));
+        command.setElementCadena(COMMAND_PARAMETER_DESCONOCIDO_2, Utils.intToByte(2));
+        command.setElementCadena(COMMAND_PARAMETER_POSITION_X, Utils.intToByte(x));
+        command.setElementCadena(COMMAND_PARAMETER_POSITION_Y, Utils.intToByte(y));
         setMatrixFace(command, cadenaFace);
         return command;
     }
