@@ -12,6 +12,7 @@ public class MeTransmission2MotorDevice {
     MeMotorDevice motorLeft;
 
     int speedForCell;
+    int speedForTurn;
     long timeForCell;
 
     public MeTransmission2MotorDevice(int portRight, int portLeft) {
@@ -62,5 +63,36 @@ public class MeTransmission2MotorDevice {
         commandSequence.addCommand(motorRight.stop());
         commandSequence.addCommand(motorLeft.stop());
         return commandSequence;
+    }
+
+    public CommandSequence turnRigth90Grados(){
+        CommandSequence commandSequence = new CommandSequence("TurnRight 90 grados");
+        commandSequence.addSequence(turnRight(speedForTurn));
+        commandSequence.addCommand(new CommandTimmer("Tiempo de giro calibrado", org.rul.meapi.common.MeConstants.WRITEMODULE, 3, timeForCell));
+        commandSequence.addCommand(motorRight.stop());
+        commandSequence.addCommand(motorLeft.stop());
+        return commandSequence;
+    }
+
+    public CommandSequence turnLeft90Grados(){
+        CommandSequence commandSequence = new CommandSequence("TurnRight 90 grados");
+        commandSequence.addSequence(turnLeft(speedForTurn));
+        commandSequence.addCommand(new CommandTimmer("Tiempo de giro calibrado", org.rul.meapi.common.MeConstants.WRITEMODULE, 3, timeForCell));
+        commandSequence.addCommand(motorRight.stop());
+        commandSequence.addCommand(motorLeft.stop());
+        return commandSequence;
+    }
+
+
+    public void setSpeedForCell(int speedForCell) {
+        this.speedForCell = speedForCell;
+    }
+
+    public void setSpeedForTurn(int speedForTurn) {
+        this.speedForTurn = speedForTurn;
+    }
+
+    public void setTimeForCell(long timeForCell) {
+        this.timeForCell = timeForCell;
     }
 }

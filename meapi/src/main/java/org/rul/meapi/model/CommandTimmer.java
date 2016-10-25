@@ -19,4 +19,11 @@ public class CommandTimmer extends CommandAbstract{
     public void setTimeMilis(long timeMilis) {
         this.timeMilis = timeMilis;
     }
+
+    @Override
+    public String toString() {
+        return "CommandTimmer{" +
+                "timeMilis=" + timeMilis +
+                '}';
+    }
 }

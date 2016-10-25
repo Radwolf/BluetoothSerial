@@ -39,6 +39,19 @@ public class Utils {
         return stringBuilder.toString();
     }
 
+    public static String byteToHexString(byte src){
+        StringBuilder stringBuilder = new StringBuilder("");
+
+        int v = src & 0xFF;
+        String hv = Integer.toHexString(v);
+        if (hv.length() < 2) {
+            stringBuilder.append(0);
+        }
+        stringBuilder.append(hv);
+
+        return stringBuilder.toString();
+    }
+
     public static byte intToByte(int intValue){
         return (byte) (intValue & 0xff);
     }
