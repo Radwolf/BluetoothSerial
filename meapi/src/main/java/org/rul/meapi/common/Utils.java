@@ -29,7 +29,7 @@ public class Utils {
             return null;
         }
         for (int i = 0; i < src.length; i++) {
-            int v = src[i] & 0xFF;
+            int v = src[i] & 0xff;
             String hv = Integer.toHexString(v);
             if (hv.length() < 2) {
                 stringBuilder.append(0);
@@ -42,7 +42,7 @@ public class Utils {
     public static String byteToHexString(byte src){
         StringBuilder stringBuilder = new StringBuilder("");
 
-        int v = src & 0xFF;
+        int v = src & 0xff;
         String hv = Integer.toHexString(v);
         if (hv.length() < 2) {
             stringBuilder.append(0);

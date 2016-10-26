@@ -47,7 +47,7 @@ public class MeBuzzerDeviceTest {
         line.open(af, Note.SAMPLE_RATE);
         line.start();
         //E2 G3  C4 B3 G3 D3 E3     C3 E3  F4 E4 C4 A3
-        play(line, Note.valueOf("E2"), 500);
+/*        play(line, Note.valueOf("E2"), 500);
         play(line, Note.REST, 10);
         play(line, Note.valueOf("G3"), 500);
         play(line, Note.REST, 10);
@@ -56,14 +56,14 @@ public class MeBuzzerDeviceTest {
         play(line, Note.valueOf("B3"), 500);
         play(line, Note.REST, 10);
         play(line, Note.valueOf("D3"), 500);
-        play(line, Note.REST, 10);
-        play(line, Note.valueOf("E3"), 500);
+        play(line, Note.REST, 10);*/
+        play(line, Note.valueOf("C4"), 500);
         play(line, Note.REST, 10);
 
         line.drain();
         line.close();
-        byte toneLow = (byte) (tone&0xff);
-        byte toneHight = (byte) ((tone>>8)&0xff);
+        byte toneLow = Utils.intToByte(tone);
+        byte toneHight = Utils.intToByte((tone>>8)&0xff);
         System.out.print(Utils.byteToHexString(toneLow) + ", " + Utils.byteToHexString(toneHight));
     }
 
