@@ -62,9 +62,12 @@ public class MeBuzzerDeviceTest {
 
         line.drain();
         line.close();
-        byte toneLow = Utils.intToByte(tone);
-        byte toneHight = Utils.intToByte((tone>>8)&0xff);
-        System.out.print(Utils.byteToHexString(toneLow) + ", " + Utils.byteToHexString(toneHight));
+        //Tone: 262
+        //toneLow = 06
+        //toneHigh = 01
+        byte toneLow = (byte) (tone & 0xFF);
+        byte toneHigh = (byte) ((tone >> 8) & 0xFF);
+        System.out.print(Utils.byteToHexString(toneLow) + ", " + Utils.byteToHexString(toneHigh));
     }
 
     @Test
