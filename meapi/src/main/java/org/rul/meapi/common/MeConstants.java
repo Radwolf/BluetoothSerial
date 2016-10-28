@@ -12,7 +12,7 @@ public class MeConstants {
     public static final int DEV_POTENTIALMETER = 4;
     public static final int DEV_JOYSTICK = 5;
     public static final int DEV_GYRO = 6;
-    public static final int DEV_BUZZER = 7;
+    public static final int DEV_SOUNDSENSOR = 7;
     public static final int DEV_RGBLED = 8;
     public static final int DEV_SEVSEG = 9;
     public static final int DEV_DCMOTOR= 10;
@@ -30,6 +30,7 @@ public class MeConstants {
     public static final int DEV_PINANALOG = 31;
     public static final int DEV_PINPWM = 32;
     public static final int DEV_PINANGLE = 33;
+    public static final int DEV_BUZZER = 34;
     public static final int DEV_CAR_CONTROLLER = 40;
     public static final int DEV_GRIPPER_CONTROLLER = 41;
 
