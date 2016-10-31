@@ -58,6 +58,7 @@ public class BluetoothSimpleActivity extends Activity {
     ImageButton buttonLeft;
     ImageButton buttonRight;
     ImageButton buttonBackward;
+    Button bRed;
 
     // Well known SPP UUID
     private static final UUID MY_UUID =
@@ -133,7 +134,15 @@ public class BluetoothSimpleActivity extends Activity {
 
         final MeMotorDevice motorDevice = new MeMotorDevice("Motor1", MeConstants.PORT_M1, 1);
         final MeUltrasonicDevice ultrasonicDevice = new MeUltrasonicDevice("USonic", MeConstants.PORT_3, 1);
-        buttonForward.setOnTouchListener(new View.OnTouchListener() {
+        bRed = (Button) findViewById(R.id.bRed);
+        bRed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CommandSimple commandMotor = motorDevice.giroDirecto(100);
+                blt.bluetoothWrite(commandMotor.getCadena());
+            }
+        });
+        /*buttonForward.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -176,7 +185,7 @@ public class BluetoothSimpleActivity extends Activity {
                 }
                 return true;
             }
-        });
+        });*/
     }
 
     @Override

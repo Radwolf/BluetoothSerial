@@ -36,7 +36,7 @@ public class MeTransmission2MotorDevice {
 
     public CommandSequence turnRight(int speed){
         CommandSequence commandSequence = new CommandSequence("Transmision turn right");
-        commandSequence.addCommand(motorRight.giroInverso(speed));
+        commandSequence.addCommand(motorRight.giroDirecto(speed));
         commandSequence.addCommand(motorLeft.giroDirecto(speed));
         return commandSequence;
     }
